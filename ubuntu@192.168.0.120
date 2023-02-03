@@ -1,0 +1,41 @@
+{
+    "channel1":{
+        "ip" : "192.168.0.142",
+        "user" : "admin",
+        "password" : "ai123456"
+    },
+    "channel2":{
+        "ip" : "192.168.0.142",
+        "user" : "admin",
+        "password" : "ai123456"
+    },   
+    "utils": {
+        "storage" : "imgcapture",
+        "width" : "1920",
+        "height" : "1080",
+        "roi1" : true,
+        "roi2" : true,
+        "bbox" : false,
+        "sound" : 2,
+        "lightTime" : 1,
+        "counterResetTime" : "16:20"
+    },
+    "backup":{
+        "usbPath":"/media/nvidia/backup/",
+        "backupTime":"16:12:00"
+    },
+    "worktime":{
+        "time1":{
+            "starttime" : "16:10",
+            "endtime" : "16:25"
+        },
+        "time2":{
+            "starttime" : "12:00",
+            "endtime" : "13:00"
+        },
+        "time3":{
+            "starttime" : "17:00",
+            "endtime" : "19:00"
+        }
+    }
+}
