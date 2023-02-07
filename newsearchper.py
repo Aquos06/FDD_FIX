@@ -14,6 +14,7 @@ import xlsxwriter
 import os
 import numpy as np
 import shutil
+import math
 
 from utility import text, textforstat, toLog
 from components.searchBox import searchBox
@@ -21,19 +22,20 @@ from components.searchBox import searchBox
 count  = [0,1]
 
 class SearchPerson(QtWidgets.QMainWindow):
-    def __init__(self,mainwindow):
+    def __init__(self):
         super(SearchPerson,self).__init__() # in python3, super(Class, self).xxx = super().xxx
         self.ui = Ui_MainWindow()
-        self.ui.setupUi(mainwindow)
+        self.ui.setupUi(self)
         self.Searchresult = []
         self.det = Falling()
         self.det.ui.setupUi(self)
         self.det.ui.rightButton.clicked.connect(self.rightButton)
         self.det.ui.leftButton.clicked.connect(self.leftButton)
         self.setup_control()  
-        self.awal = 1 #first number to display
+        self.awal = 0 #first number to display
         self.now = 0#index displayed in big screen  
         self.everShow = False
+        self.range = 10
 
         self.jsoninit()
 
@@ -44,7 +46,6 @@ class SearchPerson(QtWidgets.QMainWindow):
     def showDetail(self,filenames):
 
         self.now = self.Searchresult.index(filenames)
-        print(self.now)
         self.det.ui.buttonBack.setText('Back')
         self.det.ui.buttonBack.clicked.connect(self.back)
         
@@ -67,13 +68,11 @@ class SearchPerson(QtWidgets.QMainWindow):
     def leftButton(self):
         if (self.now + 1) < len(self.Searchresult):
             self.now += 1
-            print(self.now)
             self.changeDetails()
 
     def rightButton(self):
         if (self.now - 1) >= 0: 
             self.now -= 1
-            print(self.now)
             self.changeDetails()
 
     def changeDetails(self):
@@ -159,7 +158,19 @@ class SearchPerson(QtWidgets.QMainWindow):
         self.ui.enddate.setDateTime(QtCore.QDateTime(QtCore.QDate.currentDate(), QtCore.QTime(0, 0, 0)))
         self.ui.endtime.setDateTime(QtCore.QDateTime(QtCore.QDate.currentDate(), QtCore.QTime(17, 0, 0)))
         self.ui.enddate.setMaximumDate(QDate.currentDate())
+
+        self.ui.verticalScrollBar.valueChanged.connect(lambda: self.do_action())
+        self.ui.verticalScrollBar.rangeChanged.connect(lambda: self.ui.verticalScrollBar.setMaximum(self.range))
   
+    def do_action(self):
+
+        if math.floor(self.ui.verticalScrollBar.value()/175) > self.awal :
+            self.awal+=1
+            try:
+                self.makeperSeven(self.newresult[-(self.awal+4)])
+            except:
+                return
+
     def findChannel(self, filename):
         channel = filename.split("_")[2]
         return int(channel[-1])
@@ -320,7 +331,6 @@ class SearchPerson(QtWidgets.QMainWindow):
         return QtGui.QPixmap.fromImage(temp).scaled(label.width(), label.height())
 
     def makeperSeven(self,filenames):
-        
         path = './falldown/screenshot'
         pathcut = './falldown/cut'
         vertical = QtWidgets.QVBoxLayout()
@@ -331,7 +341,7 @@ class SearchPerson(QtWidgets.QMainWindow):
                 box = searchBox()
                 box.label.setIcon(QtGui.QIcon(os.path.join(path,i)))
                 box.label.setIconSize(QtCore.QSize(400,200))
-                box.setMinimumHeight(250)
+                box.setMinimumHeight(200)
                 box.label.clicked.connect(lambda _, text = i : self.showDetail(text))
                 cut = cv2.imread(os.path.join(pathcut,i))
                 box.labelcut.setPixmap(self.img2pyqt(cut,box.labelcut))
@@ -364,10 +374,12 @@ class SearchPerson(QtWidgets.QMainWindow):
             self.noresult()
         else: 
             first = int(len(self.Searchresult)/perRow)+1
-            newresult = self.listtoSeven(self.Searchresult,first,perRow)
-            newresult = np.array([newresult])
-            newresult = newresult.reshape(first,perRow) #2 dimension array for search box
-            for i in reversed(newresult):
+            self.newresult = self.listtoSeven(self.Searchresult,first,perRow)
+            self.newresult = np.array([self.newresult])
+            self.newresult = self.newresult.reshape(first,perRow) #2 dimension array for search box
+            for index,i in enumerate(reversed(self.newresult)):
+                if index == 5:
+                    break
                 self.makeperSeven(i)
 
     def cleardata(self):
@@ -392,6 +404,9 @@ class SearchPerson(QtWidgets.QMainWindow):
         self.cleardata()
         self.mainSearch()
         toLog("Search Fall down results")
+        self.awal = 0
+        if len(self.Searchresult) / 4 > 4:
+            self.range = ((len(self.Searchresult) / 4)+1) * 180 
         self.setIcon()
         QtWidgets.QApplication.restoreOverrideCursor()
 
@@ -435,7 +450,7 @@ class SearchPerson(QtWidgets.QMainWindow):
                     self.Searchresult.append(key+".jpg")
                 elif self.ui.type.currentText() == 'All':
                     self.Searchresult.append(key+".jpg")
-                    
+        self.Searchresult.sort()
         self.ui.total.setText(str(len(self.Searchresult)))
         
 
