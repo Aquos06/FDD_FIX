@@ -307,9 +307,6 @@ class Ui_MainWindow(object):
         self.tabs.addTab(self.tabCamera2, "Camera 2")
         self.tabs.addTab(self.tabCamera3, "Camera 3")
         self.tabs.addTab(self.tabCamera4, "Camera 4")
-        
-        self.tabs.setTabEnabled(3,False)
-        self.tabs.setTabEnabled(2,False)
 
         self.tabCamera1.layout = QtWidgets.QVBoxLayout()
         self.fill_1 = AiPage()
@@ -333,10 +330,9 @@ class Ui_MainWindow(object):
         self.tabCamera3.setLayout(self.tabCamera3.layout)
         
         self.tabCamera4.layout = QtWidgets.QVBoxLayout()
-        self.fill_4 =AiPage()
+        self.fill_4 = AiPage()
         self.fill_4.setupUi()
         self.fill_4.ROI.setChannel(3)
-        self.fill_4.tab2.layout = QtWidgets.QVBoxLayout()
         self.tabCamera4.layout.addWidget(self.fill_4)
         self.tabCamera4.setLayout(self.tabCamera4.layout)
         

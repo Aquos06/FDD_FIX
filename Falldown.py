@@ -67,6 +67,8 @@ class Screen2(QMainWindow): #CCTV
         global Settings_4
         Maincctv.ROI1 = Settings_4.ui.fill_1.ROI.ui.ROILabel
         Maincctv.ROI2 = Settings_4.ui.fill_2.ROI.ui.ROILabel
+        Maincctv.ROI3 = Settings_4.ui.fill_3.ROI.ui.ROILabel
+        Maincctv.ROI4 = Settings_4.ui.fill_4.ROI.ui.ROILabel
         
         Maincctv.login.clicked.connect(self.gotopassword)
         Maincctv.login.setText('Login')
@@ -119,11 +121,11 @@ class Screen2(QMainWindow): #CCTV
         def foo6(*args, **kwargs):
             Maincctv.writeFall(1)
 
-        # def foo7(*args, **kwargs):
-            # Maincctv.writeFall(2)
+        def foo7(*args, **kwargs):
+            Maincctv.writeFall(2)
 
-        # def foo8(*args, **kwargs):
-            # Maincctv.writeFall(3)
+        def foo8(*args, **kwargs):
+            Maincctv.writeFall(3)
 
         Maincctv.lchannel1.mouseDoubleClickEvent = foo1
         Maincctv.lchannel2.mouseDoubleClickEvent = foo2
@@ -132,8 +134,8 @@ class Screen2(QMainWindow): #CCTV
 
         Maincctv.lchannel1.mousePressEvent = foo5
         Maincctv.lchannel2.mousePressEvent = foo6
-        # Maincctv.lchannel3.mousePressEvent = foo7
-        # Maincctv.lchannel4.mousePressEvent = foo8
+        Maincctv.lchannel3.mousePressEvent = foo7
+        Maincctv.lchannel4.mousePressEvent = foo8
         
     def gotoprotol(self):
         Maincctv.stopThread()
@@ -141,7 +143,6 @@ class Screen2(QMainWindow): #CCTV
         widget.showFullScreen()
 
     def gotopassword(self):
-        Maincctv.stopThread()
         widget.setCurrentWidget(screen6)
         widget.showFullScreen()
     
@@ -283,7 +284,6 @@ class Screen6(QMainWindow): #password
             self.uipass.lineEdit_3.clear()
             self.uipass.lineEdit_4.clear()
             
-            Maincctv.resumeThread()
             widget.setCurrentWidget(screen2)
 
             Maincctv.login.setText('Home')
@@ -385,7 +385,7 @@ class Screen9(QMainWindow):
         BiggerScreen.ui.layout = Maincctv.layout
         BiggerScreen.ui.login.clicked.connect(self.goBack)
         
-        Maincctv.screen = BiggerScreen.ui.screen
+        Maincctv.worker1.screen = BiggerScreen.ui.screen
         Maincctv.layoutbig = BiggerScreen.ui.layout
         
     def goBack(self):

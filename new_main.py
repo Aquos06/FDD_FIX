@@ -26,7 +26,6 @@ from playsound import playsound
 from ZoomScreen.biggerscreen import biggerScreen
 from components.falldownbox import Box
 from clickablefall import InfoDetails
-from pp_deploy.pipeline import pipeline
 from utility import text, timetoint, setupLogin, toLog
 
 from worker1 import Worker1
@@ -66,12 +65,7 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
 
         self.InfoDetails = InfoDetails()
         
-        self.zoom_channel = 0
-        self.totalFall = [0,0,0,0]
-        self.totalPerson = [0,0,0,0]  
-
-        self.PCoor =[[],[],[],[]]
-        self.zoom = [False,False,False,False]
+        self.totalFall = 0
         self.flag = [False,False,False,False]
 
         self.layoutbig = 0
@@ -81,11 +75,6 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         setupLogin()
         
         self.bg = cv2.imread('bg.jpg')
-
-        # # pp model for 1 import
-        # self.predictor1 = pipeline.PipePredictor()
-        # # pp model for 2 import
-        # self.predictor2 = pipeline.PipePredictor()
 
         self.setSynctoTime()
         
@@ -104,8 +93,8 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         f.close()
 
     def cpBlanktoROI(self):
-        onePath = '/home/nvidia/Desktop/fall_v.5_pp_API/ROI/Camera1/blank.jpg'
-        Path1 = '/home/nvidia/Desktop/fall_v.5_pp_API/ROI/Camera1'
+        onePath = '/home/nvidia/yolov7/ROI/Camera1/blank.jpg'
+        Path1 = '/home/nvidia/yolov7/ROI/Camera1'
         shutil.copyfile(onePath, os.path.join(Path1, 'fall_down.jpg'))
         shutil.copyfile(onePath, os.path.join(Path1, 'person.jpg'))
         shutil.copyfile(onePath, os.path.join(Path1, 'PPE.jpg'))
@@ -114,6 +103,16 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         shutil.copyfile(onePath, os.path.join(Path2, 'fall_down.jpg'))
         shutil.copyfile(onePath, os.path.join(Path2, 'person.jpg'))
         shutil.copyfile(onePath, os.path.join(Path2, ' PPE.jpg'))
+
+        Path3 = '/home/nvidia/Desktop/fall_v.5_pp_API/ROI/Camera3'
+        shutil.copyfile(onePath, os.path.join(Path3, 'fall_down.jpg'))
+        shutil.copyfile(onePath, os.path.join(Path3, 'person.jpg'))
+        shutil.copyfile(onePath, os.path.join(Path3, ' PPE.jpg'))
+
+        Path4 = '/home/nvidia/Desktop/fall_v.5_pp_API/ROI/Camera4'
+        shutil.copyfile(onePath, os.path.join(Path4, 'fall_down.jpg'))
+        shutil.copyfile(onePath, os.path.join(Path4, 'person.jpg'))
+        shutil.copyfile(onePath, os.path.join(Path4, ' PPE.jpg'))
 
     def deleteItemsOfLayout(self,layout):
      if layout is not None:
@@ -165,30 +164,20 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
     def startThread(self):
         
         self.makeThread1()
-        self.makeThread2()
-        # self.makeThread3()
-        # self.makeThread4()
 
         self.makeDecoder1()
         self.makeDecoder2()
-        # self.makeDecoder3()
-        # self.makeDecoder4()
+        self.makeDecoder3()
+        self.makeDecoder4()
 
     def resumeThread(self):
         self.worker1.berenti = False
-        self.worker2.berenti = False
-        # self.worker3.berenti = False
-        # self.worker4.berenti = False
-        
+
     def stopThread(self):
-        
         self.worker1.berenti = True
-        self.worker2.berenti = True
-        # self.worker3.berenti = True
-        # self.worker4.berenti = True
 
     def details(self,filename):
-        channel = filename[23]
+        channel = filename[25]
         self.stopThread()
         
         if channel == str(1):
@@ -285,12 +274,15 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         box.information.setText(text(data[filename]['event'], data[filename]['time'], data[filename]['channel']))
         box.label.clicked.connect(lambda _, text = filename : self.details(text))
         
-        if GPIOData['function'][self.camera] == True:
-            self.Soundon()
+        # if GPIOData['function'][self.camera] == True:
+        #     self.Soundon()
 
         vertical.setStretch(0,10)
         
         self.layout.insertLayout(0,vertical)
+
+        self.totalFall += 1
+        self.labelNum.setText(f'<font color=red>{self.totalFall}</font> ')
 
         f = open('zoom.json','r')
         datazoom = json.load(f)
@@ -301,8 +293,23 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
                 self.layoutbig.insertLayout(0,vertical)
         
         postData = self.toData(filename,cut_add, ss_add, data[filename]['event'])
-        post('http://192.168.0.107/api/v2/captures/fallDown', json.dumps(postData), None, SERVER_GIVE_TOKEN)
-        
+        if post('http://192.168.0.107/api/v2/captures/fallDown', json.dumps(postData), None, SERVER_GIVE_TOKEN) != 200:
+            f = open('json/InternetProb.json','r')
+            inet = json.load(f)
+            f.close()
+
+            failData = {
+                filename:postData
+            }
+
+            inet.update(failData)
+            
+            f = open('json/InternetProb.json','w')
+            json.dump(inet,f,indent=2)
+            f.close()
+
+            toLog('Failed to upload Event to Server')
+
     def toData(self, filename, pathToCut, pathToSS,typeEvent,cid = 0):
         cid = int(filename.split("_")[2][-1])-1
         
@@ -342,16 +349,12 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         f.close()
         
         if channel == 1:
-            self.zoom[0] = True
             zoom_json['Channel1'] = True
         elif channel == 2:
-            self.zoom[1] = True
             zoom_json['Channel2'] = True
         elif channel == 3:
-            self.zoom[2] = True
             zoom_json['Channel3'] = True
         elif channel == 4:
-            self.zoom[3] = True
             zoom_json['Channel4'] = True
 
         f = open('zoom.json', 'w')
@@ -367,7 +370,6 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         
         for index,i in enumerate(zoom_json):
             zoom_json[i] = False
-            self.zoom[index] = False
 
         f = open('zoom.json', 'w')
         json.dump(zoom_json, f, indent=2)
@@ -393,80 +395,12 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         frame = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         temp = QtGui.QImage(frame, frame.shape[1], frame.shape[0], frame.shape[1]*3, QtGui.QImage.Format_RGB888)
         return QtGui.QPixmap.fromImage(temp).scaled(label.width(), label.height())
-    
-    def show(self,img, channel): 
-        if channel == 1:
-            try:
-                if self.worker1.config_file['channel1']['ROI'] == True:
-                    if self.worker1.ROI['Camera1']['FallDown'] == True:
-                        self.worker1.mask_fall = cv2.resize(self.worker1.mask_fall,(img.shape[1],img.shape[0]), interpolation = cv2.INTER_AREA)
-                        img = cv2.addWeighted(img,1, self.worker1.mask_fall,0.3,0)    
-            except:
-                pass
-            if self.zoom[0] == True:
-                try:
-                    self.screen.setPixmap(self.img2pyqt(img,self.screen))
-                except:
-                    self.lchannel1.setPixmap(self.img2pyqt(img, self.lchannel1))
-            else:
-                self.lchannel1.setPixmap(self.img2pyqt(img,self.lchannel1))
-
-        elif channel == 2:
-            try:
-                if self.worker2.config_file['channel2']['ROI'] == True:
-                    if self.worker2.ROI['Camera2']['FallDown'] == True:
-                        self.worker2.mask_fall = cv2.resize(self.worker2.mask_fall, (img.shape[1], img.shape[0]), interpolation = cv2.INTER_AREA)
-                        img = cv2.addWeighted(img,1, self.worker2.mask_fall, 0.3, 0)
-            except:
-                pass
-            if self.zoom[1] == True:
-                try:
-                    self.screen.setPixmap(self.img2pyqt(img,self.screen))
-                except:
-                    self.lchannel2.setPixmap(self.img2pyqt(img, self.lchannel2))
-            else:
-                self.lchannel2.setPixmap(self.img2pyqt(img,self.lchannel2))
-
-        elif channel == 3:
-            if self.zoom[2] == True:
-                self.screen.setPixmap(self.img2pyqt(img,self.screen))
-            else:
-                self.lchannel3.setPixmap(self.img2pyqt(img,self.lchannel3))
-        else:
-            if self.zoom[3] == True:
-                self.screen.setPixmap(self.img2pyqt(img,self.screen))
-            else:
-                self.lchannel4.setPixmap(self.img2pyqt(img,self.lchannel4))
-
-    def writelabel(self, fall, people,channel):
-        
-        if channel == 1:
-            # self.label.setText(f"{fall}<font color=white> / {people}</font>")
-            self.totalFall[0] = fall
-            self.totalPerson[0] = people
-
-        elif channel ==2 :
-            # self.label_7.setText(f"{fall}<font color=white> / {people}</font>")
-            self.totalFall[1] = fall
-            self.totalPerson[1] = people
-
-        elif channel == 3:
-            # self.label_4.setText(f"{fall}<font color=white> / {people}</font>")
-            self.totalFall[2] = fall
-            self.totalPerson[2] = people
-
-        else:
-            # self.label_13.setText(f"{fall}<font color=white> / {people}</font>")
-            self.totalFall[3] = fall
-            self.totalPerson[3] = people
-
-        self.labelNum.setText(f"<font color = red>{sum(self.totalFall)}</font> / {sum(self.totalPerson)}")
 
     def writeFall(self, channel):
         camera = ['Camera 1', 'Camera 2', 'Camera 3', 'Camera 4']
         
         self.label_6.setText(f'{camera[channel]} : <font color = red>跌倒</font>/總人數：')
-        self.label.setText(f'{self.totalFall[channel]}<font color=white> / {self.totalPerson[channel]}</font>')
+        self.label.setText(f'{self.worker1.total_people[channel][0]}<font color=white> / {self.worker1.total_people[channel][1]}</font>')
         
     def imgToBase64(self,image):
         with open(image, "rb") as image2string:
@@ -499,29 +433,16 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
             else:
                 self.worker1.detect = False
 
-        if data[todayDay]['Camera2']['all'] == True:
-            self.worker2.detect = True
-        else:
-            if data[todayDay]['Camera2']['hour'][hourNow] == 1:
-                self.worker2.detect = True
-            else:
-                self.worker2.detect = False
-
-    def passtozoom(self,img, channel):
-        if channel == 1:
-            self.zoom[0] = img
-        elif channel == 2:
-            self.zoom[1] = img
-        elif channel == 3:
-            self.zoom[2] = img
-        elif channel == 4:
-            self.zoom[3] = img
-
     def getAPI(self,timeNow,tanggal):
         toLog("Sync Settings with Server")
                 
         SERVER_GIVE_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsiZmFjZWFpIl0sInNjb3BlIjpbImFwaS1zZXJ2aWNlIl0sImV4cCI6MTkyMTE1MzI1OCwiYXV0aG9yaXRpZXMiOlsiYWl1bmlvbiJdLCJqdGkiOiI3ODI3YTBkYi0zMGQ3LTRhODItYjQyYy0yMTQ0NTMyZWRlNDEiLCJjbGllbnRfaWQiOiJhcGktY2xpZW50In0.mE8WnaGzVuWhS5LfT0ajQcBr_JP2TUOVfhch-5dJ6mA'
         dataAPI = get('http://192.168.0.107/devices', 'deviceType=aibox&sourceUrl='+getIpAddr('192.168.0.10'), SERVER_GIVE_TOKEN)
+        
+        if len(dataAPI) == 0:
+            toLog('Fail to Sync with server')
+            return
+        
         self.stopThread()
         f = open('config2Channels.json', 'r')
         data = json.load(f)
@@ -536,25 +457,44 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         data['channel1']['place'] = camera1API['title']
         data['channel1']['user'] = camera1API['username']
         data['channel1']['password'] = camera1API['password']
-        # data['channel1']['active'] = camera1API['active']
-        # data['channel1']['ROI'] = camera1API['ROI']
-        # data['channel1']['change'] = True
+        data['channel1']['active'] = camera1API['active']
+        data['channel1']['ROI'] = camera1API['ROI']
+        data['channel1']['change'] = True
 
         camera2API = dataAPI['result'][0]['settings']['camera'][1]
 
         data['channel2']['ip'] = camera2API['ip']
         data['channel2']['place'] = camera2API['title']
         data['channel2']['user'] = camera2API['username']
-        # data['channel2']['active'] = camera2API['active']
+        data['channel2']['active'] = camera2API['active']
         data['channel2']['password'] = camera2API['password']
-        # data['channel2']['ROI'] = camera2API['ROI']
-        # data['channel2']['change'] = True
+        data['channel2']['ROI'] = camera2API['ROI']
+        data['channel2']['change'] = True
+
+        camera3API = dataAPI['result'][0]['settings']['camera'][2]
+        
+        data['channel3']['ip'] = camera3API['ip']
+        data['channel3']['place'] = camera3API['title']
+        data['channel3']['user'] = camera3API['username']
+        data['channel3']['active'] = camera3API['active']
+        data['channel3']['password'] = camera3API['password']
+        data['channel3']['ROI'] = camera3API['ROI']
+        data['channel3']['change'] = True
+
+        camera4API = dataAPI['result'][0]['settings']['camera'][3]
+
+        data['channel4']['ip'] = camera4API['ip']
+        data['channel4']['place'] = camera4API['title']
+        data['channel4']['user'] = camera4API['username']
+        data['channel4']['active'] = camera4API['active']
+        data['channel4']['password'] = camera4API['password']
+        data['channel4']['ROI'] = camera4API['ROI']
+        data['channel4']['change'] = True
 
         data['async']['last'] = timeNow 
         data['async']['date'] = tanggal
 
-        # ROIcoor = dataAPI['result'][0]['settings']['ROI']
-        # timeJSon = dataAPI['result'][0]['settings']['timeTable']
+        timeJSon = dataAPI['result'][0]['settings']['Time-Table']
 
         self.stopThread()
         f = open('config2Channels.json', 'w')
@@ -564,13 +504,9 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
 
         self.lastSync.setText(timeNow)
 
-        # f = open('output/loggin.json','r')
-        # json.dump(ROIcoor,f,indent=2)
-        # f.close()
-
-        # f = open('json/timeTable.json', 'r')
-        # json.dump(timeJSon, f,indent=2)
-        # f.close()
+        f = open('json/timeTable.json', 'r')
+        json.dump(timeJSon, f,indent=2)
+        f.close()
 
     def asyncAPI(self,timeNow):
         self.stopThread()
@@ -592,38 +528,28 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
                 self.getAPI(timeNow,tanggal)
     
     def toImg(self, image):
-        if self.worker1.ready == False:  
-            self.worker1.img = image
-            self.worker1.ready = True
-        # self.ROI1.setPixmap(self.img2pyqt(image,self.ROI1))
-        # img,_,_ = drawBbox(image,self.PCoor[0], [], [])
-        # if not self.flag[0]:
-            # self.show(img,1)
-
+        if self.worker1.berenti:
+            self.ROI1.setPixmap(self.img2pyqt(image,self.ROI1))
+        else:
+            self.worker1.img1 = image
+            
     def toImg2(self,image):
-        if self.worker2.ready == False:
-            self.worker2.img = image
-            self.worker2.ready = True
-        self.ROI2.setPixmap(self.img2pyqt(image, self.ROI2))
-        img,_,_ = drawBbox(image,self.PCoor[1], [],[])
-        if not self.flag[1]:
-            self.show(img,2)
-
+        if self.worker1.berenti:
+            self.ROI2.setPixmap(self.img2pyqt(image,self.ROI2))
+        else:
+            self.worker1.img2 = image
+            
     def toImg3(self,image):
-        if self.worker3.ready == False:
-            self.worker3.img = image
-            self.worker3.ready = True
-        img,_,_ = drawBbox(image,self.PCoor[2], [],[])
-        if not self.flag[2]:
-            self.show(img,3)
+        if self.worker1.berenti:
+            self.ROI3.setPixmap(self.img2pyqt(image,self.ROI3))
+        else:
+            self.worker1.img3 = image
 
     def toImg4(self,image):
-        if self.worker4.ready == False:
-            self.worker4.img = image
-            self.worker4.ready = True
-        img,_,_ = drawBbox(image,self.PCoor[3], [],[])
-        if not self.flag[3]:
-            self.show(img,4)
+        if self.worker1.berenti:
+            self.ROI4.setPixmap(self.img2pyqt(image,self.ROI4))
+        else:
+            self.worker1.img4 = image
   
     def reconnecting(self, hai,channel):
         if not hai:
@@ -638,16 +564,6 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
             if self.worker1.config_file[camera]['active'] == True:
                 img = cv2.imread('recon.png')
                 self.show(img,channel)
-
-    def coorToImg(self, personCoor, channel):
-        if channel == 1:
-            self.PCoor[0] = personCoor
-        elif channel == 2:
-            self.PCoor[1] = personCoor
-        elif channel == 3:
-            self.PCoor[2] = personCoor
-        else:
-            self.PCoor[3] = personCoor
 
     def makeDecoder1(self): 
         self.threadImg = QtCore.QThread()
@@ -693,6 +609,7 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         self.threadImg3 = QtCore.QThread()
         self.videoStream3 = WebcamVideoStream()
         self.videoStream3.channel = 3
+        self.videoStream3.change = False
         self.videoStream3.moveToThread(self.threadImg3)
  
         f = open('config2Channels.json', 'r')
@@ -712,6 +629,7 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         self.threadImg4 = QtCore.QThread()
         self.videoStream4 = WebcamVideoStream()
         self.videoStream4.channel = 4
+        self.videoStream4.change = False
         self.videoStream4.moveToThread(self.threadImg4)
  
         f = open('config2Channels.json', 'r')
@@ -775,78 +693,19 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         self.worker1 = Worker1()
         self.worker1.moveToThread(self.thread1)
         
-        # self.worker1.predictor = self.predictor1
-
         self.thread1.started.connect(self.worker1.run)
-        self.worker1.ready = False
         self.worker1.berenti = False
-        self.worker1.channel = self.lchannel1
+        self.worker1.channel1 = self.lchannel1
+        self.worker1.channel2 = self.lchannel2
+        self.worker1.channel3 = self.lchannel3
+        self.worker1.channel4 = self.lchannel4
         self.worker1.timenow.connect(self.writetime)
         self.worker1.noCamera.connect(self.noCam)
-        self.worker1.totalfall.connect(self.writelabel)
-        self.worker1.zoom_on.connect(self.passtozoom)
         self.worker1.config.connect(self.changeIP)
-        self.worker1.koordinat.connect(self.coorToImg)
         self.worker1.fall.connect(self.showFall)
         
         self.thread1.start()
 
-    def makeThread2(self):
-        
-        self.thread2 = QtCore.QThread()
-        self.worker2 = Worker2()
-        self.worker2.moveToThread(self.thread2)
-
-        # self.worker2.predictor = self.predictor2        
-
-        self.thread2.started.connect(self.worker2.run)
-        self.worker2.noCamera.connect(self.noCam)
-        self.worker2.ready = False
-        self.worker2.berenti = False
-        self.worker2.totalfall.connect(self.writelabel)
-        self.worker2.config.connect(self.changeIP)
-        self.worker2.koordinat.connect(self.coorToImg)
-        self.worker2.fall.connect(self.showFall)
-        
-        self.thread2.start()
-
-    def makeThread3(self):
-        
-        self.thread3 = QtCore.QThread()
-        self.worker3 = Worker3()
-        self.worker3.moveToThread(self.thread3)
-
-        self.worker3.predictor = self.predictor3       
-
-        self.thread3.started.connect(self.worker3.run)
-        self.worker3.noCamera.connect(self.noCam)
-        self.worker3.ready = False
-        self.worker3.totalfall.connect(self.writelabel)
-        self.worker3.zoom_on.connect(self.passtozoom)
-        self.worker3.config.connect(self.changeIP)
-        self.worker3.koordinat.connect(self.coorToImg)
-        self.worker3.fall.connect(self.showFall)
-        
-        self.thread3.start()
-
-    def makeThread4(self):
-        
-        self.thread4 = QtCore.QThread()
-        self.worker4 = Worker4()
-        self.worker4.moveToThread(self.thread4)
-        self.worker4.ready=False
-        self.worker4.predictor = self.predictor4     
-
-        self.thread4.started.connect(self.worker2.run)
-        self.worker4.noCamera.connect(self.noCam)
-        self.worker4.totalfall.connect(self.writelabel)
-        self.worker4.zoom_on.connect(self.passtozoom)
-        self.worker4.config.connect(self.changeIP)
-        self.worker4.koordinat.connect(self.coorToImg)
-        self.worker4.fall.connect(self.showFall)
-        
-        self.thread4.start()
-        
     def writetime(self, time_now):
         self.stopThread()
         f = open('function.json','r')
@@ -858,9 +717,27 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         if time_now[-8:-3] == data['function']['counter_reset']:
             self.reset()
         
-        self.asyncAPI(time_now)
+        # self.asyncAPI(time_now)
+        # self.rePost(self)
         self.checkDetect(time_now)
         
+    def rePost(self):
+        f = open('json/InternetProb.json','r')
+        inet = json.load(f)
+        f.close()
+
+        if len(inet) == 0:
+            return
+        
+        for i in inet:
+            if post('http://192.168.0.107/api/v2/captures/fallDown', json.dumps(inet[i]), None, SERVER_GIVE_TOKEN) != 200:
+                return
+            
+        inet = {}
+        f = open('json/InternetProb.json','w')
+        json.dump(inet,f,indent=2)
+        f.close()
+           
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     ui = TwoScreen()

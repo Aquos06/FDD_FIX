@@ -41,14 +41,15 @@ def drawBbox(img, coordinate,total_channel, fall_coor):
 
     return img, len(total_channel), total_channel
     
-def NewDraw(img, coordinate):
+def NewDraw(img, coordinate, fall):
     for coor in coordinate:
         x1,y1,x2,y2,conf,classId = coor
-        if classId == 0:
-            cv2.rectangle(img, (int(x1),int(y1)), (int(x2),int(y2)), color = (255,0,0), thickness = 2)
-        else:
-            cv2.rectangle(img, (int(x1),int(y1)), (int(x2),int(y2)), color = (0,0,255), thickness = 2)
-            cv2.putText(img, "Falling", (int(x1), int(y1)-5), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0,0,255), 2)
+        cv2.rectangle(img, (int(x1),int(y1)-60), (int(x2),int(y2)-60), color = (255,0,0), thickness = 2)
+
+    for coor in fall:
+        id, x1,y1,x2,y2 = coor
+        cv2.rectangle(img, (int(x1),int(y1)-60), (int(x2),int(y2)-60), color = (0,0,255), thickness = 2)
+        cv2.putText(img, "Falling", (int(x1), int(y1)-5), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2)
 
     return img
 

@@ -216,23 +216,65 @@ class SystemSet2(QtWidgets.QMainWindow):
             self.cmdIP()
 
     def putAPI(self):
-        ip = self.ui.IpInput.text()
-
-        f = open('config2Channels.json','r')
-        config = json.load(f)
+        f = open('json/nxconfig.json','r')
+        nxconfig = json.load(f)
         f.close()
 
+        f = open('config2Channels.json','r')
+        CamConfig = json.load(f)
+        f.close()
 
-        putData = {'id': 137, 'last_seen': None, 'source_url': ip, 'enabled': True, 
-                   'rtc_enabled': True, 'name': '99', 'device_type': 'aibox', 
-                   'category': {'id': 17, 'name': '二樓辦公室', 'enabled': True}, 
-                   'identity': '', 'username': 'admin', 'password': 'ai123456', 'temperature_threshold': 0.0, 
-                   'processed_by': None, 'min_threshold': 50.0, 'max_threshold': 77.0, 'punch': False, 
-                   'settings': {'camera': [{'ip': config['channel1']['ip'], 'title': config['channel1']['place'], 'username': config['channel1']['user'], 
-                                            'password': config['channel1']['password'], 'sourceUrl': f'rtsp://{config["channel1"]["user"]}:{config["channel1"]["password"]}@{config["channel1"]["ip"]}'}, 
-                                           {'ip': config['channel2']['ip'], 'title': config['channel2']['place'], 'username': config['channel2']['user'], 
-                                                'password': config['channel2']['password'], 'sourceUrl': f'rtsp://{config["channel2"]["user"]}:{config["channel2"]["password"]}@{config["channel2"]["ip"]}'}]}}
-    
+        f = open('json/timeTable.json', 'r')
+        timedata = json.load(f)
+        f.close()
+
+        putData = {
+            'id': 137, 
+            'last_seen': None, 
+            'source_url': nxconfig['ipaddress'], 
+            'enabled': True, 
+            'rtc_enabled': True, 
+            'name': '99', 
+            'device_type': 'aibox', 
+            'category': {'id': 17, 'name': '二樓辦公室', 'enabled': True}, 
+            'identity': '', 
+            'username': 'admin', 
+            'password': 'ai123456',  
+            'settings': {
+                'camera': [
+                    {
+                        'ip': CamConfig['channel1']['ip'], 
+                        'title': CamConfig['channel1']['place'], 
+                        'username': CamConfig['channel1']['user'], 
+                        'password': CamConfig['channel1']['password'], 
+                        'active': CamConfig['channel1']['active'],
+                        'ROI': CamConfig['channel1']['ROI']},
+                    {
+                        'ip': CamConfig['channel2']['ip'], 
+                        'title': CamConfig['channel2']['place'], 
+                        'username': CamConfig['channel2']['user'], 
+                        'password': CamConfig['channel2']['password'], 
+                        'active': CamConfig['channel2']['active'],
+                        'ROI': CamConfig['channel2']['active']},
+                    {
+                        'ip': CamConfig['channel3']['ip'], 
+                        'title': CamConfig['channel3']['place'], 
+                        'username': CamConfig['channel3']['user'], 
+                        'password': CamConfig['channel3']['password'], 
+                        'active': CamConfig['channel3']['active'],
+                        'ROI': CamConfig['channel3']['active']},
+                    {    
+                        'ip': CamConfig['channel2']['ip'], 
+                        'title': CamConfig['channel2']['place'], 
+                        'username': CamConfig['channel2']['user'], 
+                        'password': CamConfig['channel2']['password'], 
+                        'active': CamConfig['channel2']['active'],
+                        'ROI': CamConfig['channel2']['active']}
+                    ],
+                'Time-Table': timedata
+        }
+    }
+
         put('http://192.168.0.107/api/v2/devices/137',json.dumps(putData),None, SERVER_GIVE_TOKEN)
     
 

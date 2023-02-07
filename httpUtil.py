@@ -85,6 +85,7 @@ def post(url, params, contentType='application/json', token=None):
     resStatus = response.status_code
     print(resStatus)
     response.raise_for_status()
+    return resStatus
   except requests.exceptions.HTTPError as err:
     error_class = err.__class__.__name__ #取得錯誤類型
     detail = err.args[0] #取得詳細內容

@@ -331,6 +331,7 @@ class SearchPerson(QtWidgets.QMainWindow):
                 box = searchBox()
                 box.label.setIcon(QtGui.QIcon(os.path.join(path,i)))
                 box.label.setIconSize(QtCore.QSize(400,200))
+                box.setMinimumHeight(250)
                 box.label.clicked.connect(lambda _, text = i : self.showDetail(text))
                 cut = cv2.imread(os.path.join(pathcut,i))
                 box.labelcut.setPixmap(self.img2pyqt(cut,box.labelcut))
@@ -387,14 +388,15 @@ class SearchPerson(QtWidgets.QMainWindow):
                     self.clearLabel(item.layout())
 
     def searchReady(self):
+        QtWidgets.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
         self.cleardata()
         self.mainSearch()
         toLog("Search Fall down results")
         self.setIcon()
+        QtWidgets.QApplication.restoreOverrideCursor()
 
     def mainSearch(self):
         
-        QtWidgets.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
         import os
         '''
             main function
@@ -435,7 +437,6 @@ class SearchPerson(QtWidgets.QMainWindow):
                     self.Searchresult.append(key+".jpg")
                     
         self.ui.total.setText(str(len(self.Searchresult)))
-        QtWidgets.QApplication.restoreOverrideCursor()
         
 
 if __name__ == '__main__':

@@ -16,9 +16,6 @@ class WebcamVideoStream(QObject):
 
     def createSRC(self):
         self.streamFunc(self.src)
-        # (self.grabbed, self.frame) = self.stream.read()
-        # if not self.grabbed:
-        #     self.ret.emit(False,self.channel)
 
     def run(self):
         self.createSRC()

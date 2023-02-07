@@ -3,44 +3,50 @@ import time
 import os
 import json
 from datetime import date,datetime
-from calculate import calculate
 import shutil
 
 class Fallutil():
 
-    def __init__(self,channel):
-        self.channel = channel
-        if self.channel == 1:
-            f = open('./temp_falldown/fall_store.json', 'r')
-        elif self.channel == 2:
-            f = open('./temp_falldown/fall_store2.json', 'r')
-        elif self.channel == 3:
-            f = open('./temp_falldown/fall_store3.json', 'r')
-        elif self.channel == 4:
-            f = open('./temp_falldown/fall_store4.json', 'r')
-            
-        self.fall_id = []
-    
-        self.fall_store = json.load(f)
-        f.close()
-        
-        self.calculate = calculate()
-        
-        self.list_fd = []
-        self.falldown = 0
+    def __init__(self):
         self.today = date.today()
         self.today = str(self.today)
 
         self.today= self.editdate()
         
-    def final_fall(self,fall_coor,person_coor,image,channel, ROI,delay):
-        self.checkInBox(fall_coor,person_coor,image,channel, ROI)
-        fallname,total = self.check_VFall(delay)
-        f = open('temp_falldown/fall_store.json', 'w')
+    def final_fall(self,fall_coor,image,channel,delay):
+        self.channel = channel
+        ratio = open('./json/ratio.json','r')
+        self.fallRatio = json.load(ratio)
+        ratio.close()
+        
+        if channel == 1:
+            f = open('./temp_falldown/fall_store.json', 'r')
+        elif channel == 2:
+            f = open('./temp_falldown/fall_store2.json', 'r')
+        elif channel == 3:
+            f = open('./temp_falldown/fall_store3.json', 'r')
+        else:
+            f = open('./temp_falldown/fall_store4.json', 'r')
+            
+        self.fall_store = json.load(f)
+        f.close()    
+            
+        self.checkInBox(fall_coor,image,channel)
+        fallname = self.check_VFall(delay*60)
+        
+        
+        if channel == 1:
+            f = open('temp_falldown/fall_store.json', 'w')
+        elif channel == 2:
+            f = open('temp_falldown/fall_store2.json','w')
+        elif channel == 3:
+            f = open('temp_falldown/fall_store3.json', 'w')
+        else:
+            f = open('temp_falldown/fall_store4.json','w')
         json.dump(self.fall_store, f, indent= 2)
         f.close()
         
-        return fallname, total
+        return fallname
         
     def editdate(self):
         strtoday =""
@@ -52,114 +58,52 @@ class Fallutil():
     
     def checkKey(self,id,channel):
         for key in self.fall_store:
-            if key[25:] == str(id) and key[23] == str(channel):
+            if key[27:] == str(id) and key[25] == str(channel):
                 self.key = key
                 return True
-
-    def translateClass(self, classes):
-        if classes == 4:
-            classes = "chk"
-            return  classes
-            
-        if classes == 5:
-            classes = "Sit"
-            return  classes
-            
-        if classes == 6:
-            classes = "Lie Down"
-            return  classes
-             
-        if classes == 7:
-            classes = "Squat"
-            return  classes
         
     def drawredbox(self,img,coor):
-        x1,y1,x2,y2,_,_= coor
+        _,x1,y1,x2,y2= coor
         
-        cv2.rectangle(img.copy(), (int(x1), int(y1)), (int(x2), int(y2)), (0,0,255), 3)
+        cv2.rectangle(img, (int(x1), int(y1)), (int(x2), int(y2)), (0,0,255), 2)
         
         return img
 
-    def checkInBox(self,fall_coor,person_coor,img,channel,ROI):
+    def checkInBox(self,fall_coor,img,channel):
         path = './temp_falldown/cut'
         path_ss = './temp_falldown/screenshot'
-        
-        if channel == 1:
-            mask_img = cv2.imread('./ROI/Camera1/fall_down.jpg')
-        if channel == 2:
-            mask_img = cv2.imread('./ROI/Camera2/fall_down.jpg')
-        if channel == 3:
-            mask_img = cv2.imread('./ROI/Camera3/fall_down.jpg')
-        if channel == 4:
-            mask_img = cv2.imread('./ROI/Camera4/fall_down.jpg')
             
-        for i in person_coor:
-            person_id,x1,y1,x2,y2 = i
-            person_id = int(person_id)
-            for j in fall_coor:
-                x11,y11,x22,y22,confidence,classes= j
-                CenterXX, CenterYY = (x22 + x11) / 2, (y22 + y11) / 2
-                classes = self.translateClass(classes)
-                if x1 < CenterXX < x2 and y1 < CenterYY <y2: 
-                    if int(y11) < int(y22) and int(x11) < int(x22) :
-                        if int(y11) > 5 and int(y22) > 5 and int(x11) > 5 and int(x22) > 5:
-                            if self.calculate.find(mask_img, i) == 1 and ROI == True:
-                                if self.checkKey(person_id,channel):
-                                    time_now = time.strftime("%H%M%S")
-                                    self.fall_store[self.key]['time'] = time_now[:2] + ":" + time_now[2:4] + ":" + time_now[-2:]
-                                    self.fall_store[self.key]['counter'] += 1
-                                else:
-                                    time_now = time.strftime("%H:%M:%S")
-                                    new_data = {
-                                        f"{self.today}_{time_now}_channel{channel}_{person_id}" :{
-                                            "counter" : 1,
-                                            "event": "fall down", 
-                                            "pass":  False,
-                                            "saved": False,
-                                            "date" : self.today[:4] + "-" + self.today[4:6] + "-" + self.today[-2:],
-                                            "time" : time_now[:2] + ":" + time_now[2:4] + ":" + time_now[-2:],
-                                            "channel": channel,
-                                        }
-                                    }
-                                    filename = f"{self.today}_{time_now}_channel{channel}_{person_id}" + ".jpg"
-                                    try:
-                                        cv2.imwrite(os.path.join(path,filename),img[int(y11):int(y22),int(x11):int(x22)])
-                                        cv2.imwrite(os.path.join(path_ss,filename),img)
-                                    except:
-                                        print('Failed to Save Falldown Image...')
-                                    else:
-                                        print('Saving FallDown Image: Sucess...')
-                                    self.fall_store.update(new_data)
-                                    img = self.drawredbox(img, j)
-                            elif ROI == False:
-                                time_now = time.strftime('%H:%M:%S')
-                                if self.checkKey(person_id,channel):
-                                    time_now = time.strftime("%H%M%S")
-                                    self.fall_store[self.key]['time'] = time_now[:2] + ":" + time_now[2:4] + ":" + time_now[-2:]
-                                    self.fall_store[self.key]['counter'] += 1
-                                else:
-                                    new_data = {
-                                        f"{self.today}_{time_now}_channel{channel}_{person_id}" :{
-                                            "counter" : 1,
-                                            "event": "fall down",
-                                            "pass":  False,
-                                            "saved": False,
-                                            "date" : self.today[:4] + "-" + self.today[4:6] + "-" + self.today[-2:],
-                                            "time" : time_now[:2] + ":" + time_now[2:4] + ":" + time_now[-2:],
-                                            "channel": channel,
-                                        }
-                                    }
-                                    filename = f"{self.today}_{time_now}_channel{channel}_{person_id}" + ".jpg"
-                                    try:
-                                        cv2.imwrite(os.path.join(path_ss,filename),img)
-                                        cv2.imwrite(os.path.join(path,filename),img[int(y11):int(y22),int(x11):int(x22)])
-                                    except:
-                                        print('Failed to Save Falldown Image...')
-                                    else:
-                                        print('Saving FallDown Image: Sucess...')
-                                    self.fall_store.update(new_data)
-                                    img = self.drawredbox(img,j)
-                
+        for coor in fall_coor:
+            personId,x1,y1,x2,y2 = coor
+            time_now = time.strftime('%H:%M:%S')
+            
+            if self.checkKey(int(personId),channel):
+                time_now = time.strftime("%H%M%S")
+                self.fall_store[self.key]['time'] = time_now[:2] + ":" + time_now[2:4] + ":" + time_now[-2:]
+                self.fall_store[self.key]['counter'] += 1
+            else:
+                new_data = {
+                    f"{self.today}_{time_now}_channel{channel}_{int(personId)}" :{
+                        "counter" : 1,
+                        "event": "fall down",
+                        "pass":  False,
+                        "saved": False,
+                        "date" : self.today[:4] + "-" + self.today[4:6] + "-" + self.today[-2:],
+                        "time" : time_now[:2] + ":" + time_now[3:5] + ":" + time_now[-2:],
+                        "channel": channel,
+                    }
+                }
+                filename = f"{self.today}_{time_now}_channel{channel}_{int(personId)}" + ".jpg"
+                img = self.drawredbox(img,coor)
+                try:
+                    cv2.imwrite(os.path.join(path_ss,filename),img)
+                    cv2.imwrite(os.path.join(path,filename),img[int(y1):int(y2),int(x1):int(x2)])
+                except:
+                    print('Failed to Save Falldown Image...')
+                else:
+                    print('Saving FallDown Image: Sucess...')
+                self.fall_store.update(new_data)
+
      
     def timetoint(self,hour,minute,second):
         
@@ -168,17 +112,21 @@ class Fallutil():
     def check_VFall(self,delay):
         time_now = datetime.now()
         time_now_seconds = self.timetoint(time_now.hour, time_now.minute, time_now.second)
-        deleteFall = []
+        self.deleteKey = []
         for key in self.fall_store:
-            
             key_time_seconds = self.timetoint(int(self.fall_store[key]['time'][:2]), int(self.fall_store[key]['time'][3:5]), int(self.fall_store[key]['time'][-2:]))    
-            if time_now_seconds - key_time_seconds > delay:
-                if self.fall_store[key]['counter'] > 3:
+            if time_now_seconds - key_time_seconds > 1:
+                if self.fall_store[key]['counter'] > self.fall_store[key]['counter']*int(3*int(self.fallRatio['ratio'])):
                     self.fall_store[key]['pass'] = True
+            # else:
+            #     self.deleteKey.append(key)
                 
-        fallname,total = self.SaveFall()
+        fallname = self.SaveFall()
             
-        return fallname, total
+        # for i in self.deleteKey:
+        #     del self.fall_store[i]
+
+        return fallname
     
     def SaveFall(self):
         temp_path = './temp_falldown/cut'
@@ -204,9 +152,7 @@ class Fallutil():
         for key in self.fall_store:
             if self.fall_store[key]['pass'] == True and self.fall_store[key]['saved'] == False:
                 self.fall_store[key]['saved'] = True
-                self.falldown += 1
                 key = key + ".jpg"
-                self.list_fd.append(key)
                 
                 if shutil.disk_usage("./falldown").free < 1000:
                     if self.config["utils"]["storageMethod"] == True:
@@ -234,7 +180,7 @@ class Fallutil():
                 self.fall_data.update(newdata)
                 key_temp.append(key)
                 
-                self.falldown += 1
+                # self.falldown += 1
 
         for key in key_temp:
             del self.fall_store[key]
@@ -251,6 +197,4 @@ class Fallutil():
         json.dump(self.fall_data, f, indent=2)
         f.close()
 
-        return key_temp, self.falldown
-    
-        
+        return key_temp

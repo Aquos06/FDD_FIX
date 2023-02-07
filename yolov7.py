@@ -68,8 +68,7 @@ class detect():
 
         with torch.no_grad():
             self.pred = self.model(self.img, augment = False)[0]
-
-        self.pred = non_max_suppression(self.pred, 0.45,0.55,agnostic=True)
+            self.pred = non_max_suppression(self.pred, 0.6,0.45,agnostic=True)
 
         self.pred = self.pred[0].cpu().tolist()
 

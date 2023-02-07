@@ -66,23 +66,21 @@ class SystemSet(QtWidgets.QMainWindow):
         self.backup()
 
     def setSync(self):
-        Inputlist = [self.ui.place1, self.ui.ip1, self.ui.password1, self.ui.password1_2, self.ui.place2, self.ui.ip2, self.ui.password3, 
+        self.Inputlist = [self.ui.place1, self.ui.ip1, self.ui.password1, self.ui.password1_2, self.ui.place2, self.ui.ip2, self.ui.password3, 
         self.ui.password4, self.ui.place3, self.ui.ip3, self.ui.password_new1, self.ui.password1_new2, 
         self.ui.place4, self.ui.ip4, self.ui.password_new3, self.ui.password_new4, self.ui.ROI_onButton,self.ui.toggle_IO,self.ui.ROI_onButton2,self.ui.ROI_onButton_3,
         self.ui.ROI_onButton_4, self.ui.toggle_IO_2, self.ui.toggle_IO_3, self.ui.toggle_IO_4, self.ui.back, self.ui.start]
         self.ui.sync.setChecked(True)
-        for i in Inputlist:
+        for i in self.Inputlist:
             i.setEnabled(False)
 
     def checkSync(self):
-        Inputlist = [self.ui.place1, self.ui.ip1, self.ui.password1, self.ui.password1_2, self.ui.place2, self.ui.ip2, self.ui.password3, 
-        self.ui.password4,  self.ui.ROI_onButton,self.ui.toggle_IO,self.ui.ROI_onButton2, self.ui.toggle_IO_2, self.ui.back, self.ui.start]
         if self.ui.sync.isChecked():
-            for i in Inputlist:
+            for i in self.Inputlist:
                 i.setEnabled(False)
             toLog("Camera Settings from device disabled")
         else:
-            for i in Inputlist:
+            for i in self.Inputlist:
                 i.setEnabled(True)
             toLog("Camera Settings from device enabled")
     
@@ -244,30 +242,52 @@ class SystemSet(QtWidgets.QMainWindow):
         timedata = json.load(f)
         f.close()
 
-        f = open('output/loggin.json', 'r')
-        ROIdata = json.load(f)
-        f.close()
-
-        # putData = {'id': 137, 'last_seen': None, 'source_url': nxconfig['ipaddress'], 'enabled': True, 
-        #            'rtc_enabled': True, 'name': '99', 'device_type': 'aibox', 
-        #            'category': {'id': 17, 'name': '二樓辦公室', 'enabled': True}, 
-        #            'identity': '', 'username': 'admin', 'password': 'ai123456', 'temperature_threshold': 0.0, 
-        #            'processed_by': None, 'min_threshold': 50.0, 'max_threshold': 77.0, 'punch': False, 
-        #            'settings': {'ROI':ROIdata,'timeTable':timedata,'camera': [{'ip': self.data['channel1']['ip'], 'title': self.data['channel1']['place'], 'username': self.data['channel1']['user'], 
-        #                                     'password': self.data['channel1']['password'], 'sourceUrl': f'rtsp://{self.data["channel1"]["user"]}:{self.data["channel1"]["password"]}@{self.data["channel1"]["ip"]}','active':self.data['channel1']['active'],'ROI' : self.data['channel1']['ROI']}, 
-        #                                    {'ip': self.data['channel2']['ip'], 'title': self.data['channel2']['place'], 'username': self.data['channel2']['user'], 
-        #                                         'password': self.data['channel2']['password'], 'sourceUrl': f'rtsp://{self.data["channel2"]["user"]}:{self.data["channel2"]["password"]}@{self.data["channel2"]["ip"]}', 'active': self.data['channel2']['active'],'ROI' : self.data['channel2']['ROI']}]}}
-
-        putData = {'id': 137, 'last_seen': None, 'source_url': nxconfig['ipaddress'], 'enabled': True, 
-            'rtc_enabled': True, 'name': '99', 'device_type': 'aibox', 
+        putData = {
+            'id': 137, 
+            'last_seen': None, 
+            'source_url': nxconfig['ipaddress'], 
+            'enabled': True, 
+            'rtc_enabled': True, 
+            'name': '99', 
+            'device_type': 'aibox', 
             'category': {'id': 17, 'name': '二樓辦公室', 'enabled': True}, 
-            'identity': '', 'username': 'admin', 'password': 'ai123456', 'temperature_threshold': 0.0, 
-            'processed_by': None, 'min_threshold': 50.0, 'max_threshold': 77.0, 'punch': False, 
-            'settings': {'camera': [{'ip': self.data['channel1']['ip'], 'title': self.data['channel1']['place'], 'username': self.data['channel1']['user'], 
-                                    'password': self.data['channel1']['password'], 'sourceUrl': f'rtsp://{self.data["channel1"]["user"]}:{self.data["channel1"]["password"]}@{self.data["channel1"]["ip"]}'}, 
-                                    {'ip': self.data['channel2']['ip'], 'title': self.data['channel2']['place'], 'username': self.data['channel2']['user'], 
-                                        'password': self.data['channel2']['password'], 'sourceUrl': f'rtsp://{self.data["channel2"]["user"]}:{self.data["channel2"]["password"]}@{self.data["channel2"]["ip"]}'}]}}
-
+            'identity': '', 
+            'username': 'admin', 
+            'password': 'ai123456',  
+            'settings': {
+                'camera': [
+                    {
+                        'ip': self.data['channel1']['ip'], 
+                        'title': self.data['channel1']['place'], 
+                        'username': self.data['channel1']['user'], 
+                        'password': self.data['channel1']['password'], 
+                        'active': self.data['channel1']['active'],
+                        'ROI': self.data['channel1']['ROI']},
+                    {
+                        'ip': self.data['channel2']['ip'], 
+                        'title': self.data['channel2']['place'], 
+                        'username': self.data['channel2']['user'], 
+                        'password': self.data['channel2']['password'], 
+                        'active': self.data['channel2']['active'],
+                        'ROI': self.data['channel2']['active']},
+                    {
+                        'ip': self.data['channel3']['ip'], 
+                        'title': self.data['channel3']['place'], 
+                        'username': self.data['channel3']['user'], 
+                        'password': self.data['channel3']['password'], 
+                        'active': self.data['channel3']['active'],
+                        'ROI': self.data['channel3']['active']},
+                    {    
+                        'ip': self.data['channel2']['ip'], 
+                        'title': self.data['channel2']['place'], 
+                        'username': self.data['channel2']['user'], 
+                        'password': self.data['channel2']['password'], 
+                        'active': self.data['channel2']['active'],
+                        'ROI': self.data['channel2']['active']}
+                    ],
+                'Time-Table': timedata
+                }
+        }
 
         put('http://192.168.0.107/api/v2/devices/137',json.dumps(putData),None, SERVER_GIVE_TOKEN)
     

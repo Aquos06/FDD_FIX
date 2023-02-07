@@ -2,6 +2,9 @@ from .TimeTable import TimeTable
 import json 
 from PyQt5 import QtWidgets
 from utility import toLog
+from httpUtil import put
+
+SERVER_GIVE_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsiZmFjZWFpIl0sInNjb3BlIjpbImFwaS1zZXJ2aWNlIl0sImV4cCI6MTkyMTE1MzI1OCwiYXV0aG9yaXRpZXMiOlsiYWl1bmlvbiJdLCJqdGkiOiI3ODI3YTBkYi0zMGQ3LTRhODItYjQyYy0yMTQ0NTMyZWRlNDEiLCJjbGllbnRfaWQiOiJhcGktY2xpZW50In0.mE8WnaGzVuWhS5LfT0ajQcBr_JP2TUOVfhch-5dJ6mA'
 
 class TimeSelect(QtWidgets.QWidget):
     def __init__(self):
@@ -68,7 +71,7 @@ class TimeSelect(QtWidgets.QWidget):
     def disable3(self):
         self.ui.camera3_all.setChecked(False)
 
-    def disable4(Self):
+    def disable4(self):
         self.ui.camera4_all.setChecked(False)
         
     def setupUI(self,day):
@@ -174,7 +177,69 @@ class TimeSelect(QtWidgets.QWidget):
             for i in self.button4:
                 i.setChecked(False)
             self.flag_4=False
-            
+
+    def putAPI(self):
+        f = open('json/nxconfig.json','r')
+        nxconfig = json.load(f)
+        f.close()
+
+        f = open('config2Channels.json','r')
+        CamConfig = json.load(f)
+        f.close()
+
+        f = open('json/timeTable.json', 'r')
+        timedata = json.load(f)
+        f.close()
+
+        putData = {
+            'id': 137, 
+            'last_seen': None, 
+            'source_url': nxconfig['ipaddress'], 
+            'enabled': True, 
+            'rtc_enabled': True, 
+            'name': '99', 
+            'device_type': 'aibox', 
+            'category': {'id': 17, 'name': '二樓辦公室', 'enabled': True}, 
+            'identity': '', 
+            'username': 'admin', 
+            'password': 'ai123456',  
+            'settings': {
+                'camera': [
+                    {
+                        'ip': CamConfig['channel1']['ip'], 
+                        'title': CamConfig['channel1']['place'], 
+                        'username': CamConfig['channel1']['user'], 
+                        'password': CamConfig['channel1']['password'], 
+                        'active': CamConfig['channel1']['active'],
+                        'ROI': CamConfig['channel1']['ROI']},
+                    {
+                        'ip': CamConfig['channel2']['ip'], 
+                        'title': CamConfig['channel2']['place'], 
+                        'username': CamConfig['channel2']['user'], 
+                        'password': CamConfig['channel2']['password'], 
+                        'active': CamConfig['channel2']['active'],
+                        'ROI': CamConfig['channel2']['active']},
+                    {
+                        'ip': CamConfig['channel3']['ip'], 
+                        'title': CamConfig['channel3']['place'], 
+                        'username': CamConfig['channel3']['user'], 
+                        'password': CamConfig['channel3']['password'], 
+                        'active': CamConfig['channel3']['active'],
+                        'ROI': CamConfig['channel3']['active']},
+                    {    
+                        'ip': CamConfig['channel2']['ip'], 
+                        'title': CamConfig['channel2']['place'], 
+                        'username': CamConfig['channel2']['user'], 
+                        'password': CamConfig['channel2']['password'], 
+                        'active': CamConfig['channel2']['active'],
+                        'ROI': CamConfig['channel2']['active']}
+                    ],
+                'Time-Table': timedata
+        }
+    }
+
+        put('http://192.168.0.107/api/v2/devices/137',json.dumps(putData),None, SERVER_GIVE_TOKEN)
+
     def save(self):
         f = open('json/timeTable.json', 'r')
         data = json.load(f)
@@ -269,11 +334,12 @@ class TimeSelect(QtWidgets.QWidget):
                         data[self.day]['Camera4']['hour'][index] = 1
                     else:
                         data[self.day]['Camera4']['hour'][index] = 0
-            
+        
         f = open('json/timeTable.json', 'w')
         json.dump(data,f,indent=2)
         f.close()
         toLog('Detection Schedule is updated')
+        self.putAPI()
         self.closewindow()
     
     def closewindow(self):
