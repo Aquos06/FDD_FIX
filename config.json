@@ -1,0 +1,24 @@
+{
+    "channel1":{
+        "ip" : "192.168.0.142",
+        "user" : "admin",
+        "password" : "ai123456"
+    },
+    "channel2":{
+        "ip" : "192.168.0.142",
+        "user" : "admin",
+        "password" : "ai123456"
+    },   
+    "utils": {
+        "storage" : "store",
+        "width" : "1080",
+        "height" : "720",
+        "roi" : 0,
+        "bbox" : 0,
+        "sound" : 0
+    },
+    "backup":{
+        "usb_path":"/home/nvidia/Desktop",
+        "backuptime":"16:12:00"
+    }
+}

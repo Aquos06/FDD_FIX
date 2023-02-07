@@ -1,0 +1,18 @@
+{
+  "Channel1": {
+    "active": true,
+    "change": true
+  },
+  "Channel2": {
+    "active": true,
+    "change": true
+  },
+  "Channel3": {
+    "active": false,
+    "change": true
+  },
+  "Channel4": {
+    "active": false,
+    "change": true
+  }
+}

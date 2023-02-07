@@ -6,7 +6,7 @@
 *.h
 *.txt
 *.csv
-*.json
+# *.json
 /background
 /build
 /factoryreset
