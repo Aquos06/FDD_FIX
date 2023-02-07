@@ -6,7 +6,6 @@
 *.h
 *.txt
 *.csv
-# *.json
 /background
 /build
 /factoryreset
@@ -27,3 +26,5 @@
 *.trt
 *.engine
 *.pt
+/tensorrtx
+/tensorrt-python
