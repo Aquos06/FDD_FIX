@@ -18,6 +18,7 @@ from utility import toLog
 import sys
 import json
 
+
 class Screen1(QMainWindow):
     def __init__(self):
         super(Screen1,self).__init__()
@@ -65,10 +66,10 @@ class Screen2(QMainWindow): #CCTV
         self.data = json.load(f)
         f.close()
         global Settings_4
-        Maincctv.ROI1 = Settings_4.ui.fill_1.ROI.ui.ROILabel
-        Maincctv.ROI2 = Settings_4.ui.fill_2.ROI.ui.ROILabel
-        Maincctv.ROI3 = Settings_4.ui.fill_3.ROI.ui.ROILabel
-        Maincctv.ROI4 = Settings_4.ui.fill_4.ROI.ui.ROILabel
+        Maincctv.worker.ROI = Settings_4.ui.fill_1.ROI.ui.ROILabel
+        Maincctv.videoStream.ROI = Settings_4.ui.fill_2.ROI.ui.ROILabel
+        Maincctv.videoStream3.ROI = Settings_4.ui.fill_3.ROI.ui.ROILabel
+        Maincctv.videoStream4.ROI = Settings_4.ui.fill_4.ROI.ui.ROILabel
         
         Maincctv.login.clicked.connect(self.gotopassword)
         Maincctv.login.setText('Login')
@@ -458,5 +459,6 @@ widget.addWidget(screen10)
 
 widget.setCurrentWidget(screen2)
 widget.showFullScreen()
+
 
 sys.exit(app.exec_())

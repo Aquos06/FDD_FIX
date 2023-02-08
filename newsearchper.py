@@ -15,6 +15,7 @@ import os
 import numpy as np
 import shutil
 import math
+import gc
 
 from utility import text, textforstat, toLog
 from components.searchBox import searchBox
@@ -167,7 +168,7 @@ class SearchPerson(QtWidgets.QMainWindow):
         if math.floor(self.ui.verticalScrollBar.value()/175) > self.awal :
             self.awal+=1
             try:
-                self.makeperSeven(self.newresult[-(self.awal+4)])
+                self.makeperSeven(self.newresult[-(self.awal+5)])
             except:
                 return
 
@@ -308,19 +309,18 @@ class SearchPerson(QtWidgets.QMainWindow):
  
         retval = msg.exec_()
     
-    def fromfilename(self,filename):
+    def fromfilename(sel,filename):
         date = filename.split("_")[0]
         date = date[0:4] + "-" + date[4:6] + "-" + date[6:8]
         
         time = filename.split("_")[1]
-        time = time[:2] + ":" + time[2:4] + ":" + time[4:6]
         
         channel = filename.split("_")[2]
         channel = channel[-1]   
 
         event = "falldown"
         
-        return event,date,time,channel
+        return event,time,date,channel
     
     def img2pyqt(self,img,label):
         '''
@@ -368,7 +368,6 @@ class SearchPerson(QtWidgets.QMainWindow):
         return c.tolist()
 
     def setIcon(self):
-        path = './falldown/cut'
         perRow = 4
         if len(self.Searchresult) == 0:
             self.noresult()
@@ -378,7 +377,7 @@ class SearchPerson(QtWidgets.QMainWindow):
             self.newresult = np.array([self.newresult])
             self.newresult = self.newresult.reshape(first,perRow) #2 dimension array for search box
             for index,i in enumerate(reversed(self.newresult)):
-                if index == 5:
+                if index == 6:
                     break
                 self.makeperSeven(i)
 
@@ -388,13 +387,14 @@ class SearchPerson(QtWidgets.QMainWindow):
             layout = self.ui.layout.itemAt(i)
             self.clearLabel(self.ui.layout)
             self.ui.layout.removeItem(layout)
-            
+
     def clearLabel(self,layout):
         if layout is not None:
             while layout.count():
                 item = layout.takeAt(0)
                 widget = item.widget()
                 if widget is not None:
+                    widget.setParent(None)
                     widget.deleteLater()
                 else:
                     self.clearLabel(item.layout())
@@ -407,6 +407,8 @@ class SearchPerson(QtWidgets.QMainWindow):
         self.awal = 0
         if len(self.Searchresult) / 4 > 4:
             self.range = ((len(self.Searchresult) / 4)+1) * 180 
+        else:
+            self.range = 0
         self.setIcon()
         QtWidgets.QApplication.restoreOverrideCursor()
 

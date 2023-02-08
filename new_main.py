@@ -5,7 +5,6 @@ import shutil
 import numpy as np
 import pycuda.autoinit
 import pycuda.driver as cuda
-import tensorrt as trty
 import json
 import logging
 import logging.handlers
@@ -14,8 +13,6 @@ import RPi.GPIO as GPIO
 import base64
 from datetime import date,datetime
 
-from os import stat
-from glob import glob
 import time, json
 from PyQt5 import QtGui, QtWidgets, QtCore
 from PyQt5.QtWidgets import QMainWindow,QWidget
@@ -23,20 +20,14 @@ from PyQt5.QtWidgets import QMainWindow,QWidget
 
 from newtwochannel2 import Ui_MainWindowp
 from playsound import playsound
-from ZoomScreen.biggerscreen import biggerScreen
 from components.falldownbox import Box
 from clickablefall import InfoDetails
 from utility import text, timetoint, setupLogin, toLog
 
 from worker1 import Worker1
-from worker2  import Worker2
-from worker3 import Worker3
-from worker4 import Worker4
-from yoloEngine import yolov5_engine
-from coorutil import drawBbox
 from httpUtil import get, post, getIpAddr
 from VideoStream import WebcamVideoStream
-from allutility.updateTime import UpdateTime
+from yolov7 import detect
 
 
 #HYPER PARAMS
@@ -64,9 +55,9 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         self.cpBlanktoROI()
 
         self.InfoDetails = InfoDetails()
+        self.yolov7 = detect()
         
         self.totalFall = 0
-        self.flag = [False,False,False,False]
 
         self.layoutbig = 0
         self.screen = 0
@@ -172,13 +163,14 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
 
     def resumeThread(self):
         self.worker1.berenti = False
+        pass
 
     def stopThread(self):
         self.worker1.berenti = True
+        pass
 
     def details(self,filename):
         channel = filename[25]
-        self.stopThread()
         
         if channel == str(1):
             f = open('./falldown/all_falldown.json', 'r')
@@ -192,7 +184,6 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         data = json.load(f)
         f.close()
         
-        self.resumeThread()
         
         image_ss = filename
         image = filename
@@ -233,7 +224,6 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         sound.join()
 
     def showFall(self,filename,channel):
-        self.stopThread()
         
         global SERVER_GIVE_TOKEN
         
@@ -256,7 +246,6 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         data = json.load(f)
         f.close()
         
-        self.resumeThread()
 
         f = open('function.json', 'r')
         GPIOData = json.load(f)
@@ -343,7 +332,6 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         return data
     
     def zoom_show(self,channel):        
-        self.stopThread()
         f = open('zoom.json', 'r')
         zoom_json = json.load(f)
         f.close()
@@ -360,10 +348,8 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         f = open('zoom.json', 'w')
         json.dump(zoom_json, f, indent= 2)
         f.close()
-        self.resumeThread()
                 
     def back(self):
-        self.stopThread()
         f = open('zoom.json', 'r')
         zoom_json = json.load(f)
         f.close()
@@ -374,7 +360,6 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         f = open('zoom.json', 'w')
         json.dump(zoom_json, f, indent=2)
         f.close()
-        self.resumeThread()
         
     def back2(self):
         self.InfoDetails.close()
@@ -443,11 +428,9 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
             toLog('Fail to Sync with server')
             return
         
-        self.stopThread()
         f = open('config2Channels.json', 'r')
         data = json.load(f)
         f.close()
-        self.resumeThread()
 
         data['deviceID'] = dataAPI['result'][0]['id']
 
@@ -496,11 +479,9 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
 
         timeJSon = dataAPI['result'][0]['settings']['Time-Table']
 
-        self.stopThread()
         f = open('config2Channels.json', 'w')
         json.dump(data,f,indent=2)
         f.close()
-        self.resumeThread()
 
         self.lastSync.setText(timeNow)
 
@@ -509,14 +490,12 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         f.close()
 
     def asyncAPI(self,timeNow):
-        self.stopThread()
         try:
             f = open('config2Channels.json', 'r')
             data = json.load(f)
             f.close()
         except:
             return
-        self.resumeThread()
         tanggal = timeNow[:10]
         timeNow = timeNow[-8:]
         if data['async']['enable'] == True:
@@ -528,27 +507,27 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
                 self.getAPI(timeNow,tanggal)
     
     def toImg(self, image):
-        if self.worker1.berenti:
-            self.ROI1.setPixmap(self.img2pyqt(image,self.ROI1))
-        else:
+        # if self.worker1.berenti:
+        #     self.ROI1.setPixmap(self.img2pyqt(image,self.ROI1))
+        # else:
             self.worker1.img1 = image
             
     def toImg2(self,image):
-        if self.worker1.berenti:
-            self.ROI2.setPixmap(self.img2pyqt(image,self.ROI2))
-        else:
+        # if self.worker1.berenti:
+        #     self.ROI2.setPixmap(self.img2pyqt(image,self.ROI2))
+        # else:
             self.worker1.img2 = image
             
     def toImg3(self,image):
-        if self.worker1.berenti:
-            self.ROI3.setPixmap(self.img2pyqt(image,self.ROI3))
-        else:
+        # if self.worker1.berenti:
+        #     self.ROI3.setPixmap(self.img2pyqt(image,self.ROI3))
+        # else:
             self.worker1.img3 = image
 
     def toImg4(self,image):
-        if self.worker1.berenti:
-            self.ROI4.setPixmap(self.img2pyqt(image,self.ROI4))
-        else:
+        # if self.worker1.berenti:
+        #     self.ROI4.setPixmap(self.img2pyqt(image,self.ROI4))
+        # else:
             self.worker1.img4 = image
   
     def reconnecting(self, hai,channel):
@@ -657,36 +636,6 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         else:
             self.videoStream4.streamFunc(uri)
 
-    def noCam(self, flag, channel):
-        if channel == 1: 
-            if flag :
-                self.flag[0] = flag
-                img = cv2.imread('NoCamera.png')
-                self.show(img,1)
-            else:
-                self.flag[0] = flag
-        elif channel == 2:
-            if flag :
-                self.flag[1] = flag
-                img = cv2.imread('NoCamera.png')
-                self.show(img,2)
-            else:
-                self.flag[1] = flag
-        elif channel == 3:
-            if flag:
-                self.flag[2] = flag
-                img = cv2.imread('NoCamera.png')
-                self.show(img,3)
-            else:
-                self.flag[2] = flag
-        else:
-            if flag:
-                self.flag[3] = flag
-                img = cv2.imread('NoCamera.png')
-                self.show(img,4)
-            else:
-                self.flag[3] = flag
-
     def makeThread1(self):
         
         self.thread1 = QtCore.QThread()
@@ -694,24 +643,22 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         self.worker1.moveToThread(self.thread1)
         
         self.thread1.started.connect(self.worker1.run)
-        self.worker1.berenti = False
         self.worker1.channel1 = self.lchannel1
         self.worker1.channel2 = self.lchannel2
         self.worker1.channel3 = self.lchannel3
         self.worker1.channel4 = self.lchannel4
+        self.worker1.yolov7 = self.yolov7
+        self.worker1.berenti = False
         self.worker1.timenow.connect(self.writetime)
-        self.worker1.noCamera.connect(self.noCam)
         self.worker1.config.connect(self.changeIP)
         self.worker1.fall.connect(self.showFall)
         
         self.thread1.start()
 
     def writetime(self, time_now):
-        self.stopThread()
         f = open('function.json','r')
         data = json.load(f)
         f.close()
-        self.resumeThread()
         self.time.setText(time_now)
 
         if time_now[-8:-3] == data['function']['counter_reset']:

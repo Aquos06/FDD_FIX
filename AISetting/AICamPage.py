@@ -29,10 +29,8 @@ class AiPage(QtWidgets.QWidget):
 
         self.superLayout.addWidget(self.tabs)
 
-
         self.setLayout(self.superLayout)
-        
-        
+
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)

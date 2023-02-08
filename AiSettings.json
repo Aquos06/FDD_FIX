@@ -83,7 +83,8 @@
         "yellow": false
       },
       "mask": false
-    }
+    },
+    "change": false
   },
   "Camera4": {
     "Person": false,
@@ -111,6 +112,7 @@
         "yellow": false
       },
       "mask": false
-    }
+    },
+    "change": false
   }
 }

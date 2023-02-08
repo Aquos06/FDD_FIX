@@ -17,6 +17,14 @@ class WebcamVideoStream(QObject):
     def createSRC(self):
         self.streamFunc(self.src)
 
+    def img2pyqt(self,img,label):
+        '''
+        convert the opencv format to pyqt format color
+        '''
+        frame = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        temp = QtGui.QImage(frame, frame.shape[1], frame.shape[0], frame.shape[1]*3, QtGui.QImage.Format_RGB888)
+        return QtGui.QPixmap.fromImage(temp).scaled(label.width(), label.height())
+
     def run(self):
         self.createSRC()
         while True:
@@ -26,6 +34,11 @@ class WebcamVideoStream(QObject):
 
             grab, self.frame = self.stream.read()
 
+            try:
+               self.ROI.setPixmap(self.img2pyqt(self.frame,self.ROI))
+            except:
+                pass
+            
             if not grab:
                 self.ret.emit(False, self.channel)
                 while True:
@@ -37,3 +50,4 @@ class WebcamVideoStream(QObject):
                         break
             else:
                 self.picdone.emit(self.frame)
+                # self.picdone.clear()

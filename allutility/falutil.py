@@ -118,13 +118,13 @@ class Fallutil():
             if time_now_seconds - key_time_seconds > 1:
                 if self.fall_store[key]['counter'] > self.fall_store[key]['counter']*int(3*int(self.fallRatio['ratio'])):
                     self.fall_store[key]['pass'] = True
-            # else:
-            #     self.deleteKey.append(key)
+            else:
+                self.deleteKey.append(key)
                 
         fallname = self.SaveFall()
             
-        # for i in self.deleteKey:
-        #     del self.fall_store[i]
+        for i in self.deleteKey:
+            del self.fall_store[i]
 
         return fallname
     

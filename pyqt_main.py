@@ -13,6 +13,7 @@ import json
 import cv2
 import qdarkstyle
 import time 
+import gc
 
 from utility import toLog
 
@@ -36,13 +37,13 @@ class roiwidge(QWidget):  # 介面布局自動縮放
         self.ui.Person_ROI.setEnabled(False)
 
         # for save draw roi pos
-        self.ROI_view = dict()
+        self.ROI_view = {}
         self.lastPoint = QPoint()
         self.endPoint = QPoint()
-        self.points = list()  # 僅多邊形使用
-        self.name = list()
+        self.points = []  # 僅多邊形使用
+        self.name = []
         self.rect_draw_count = 0
-        self.tmp_multi = list()
+        self.tmp_multi = []
         
         self.qssStyle = '''
                     QHeaderView
@@ -190,6 +191,7 @@ class roiwidge(QWidget):  # 介面布局自動縮放
     #  滑鼠控制事件 : 滑鼠點擊
     def gpmousePressEvent(self, event):
         # 按下鼠標左鍵
+        # print(1)
         if event.buttons() == QtCore.Qt.LeftButton:
             # 獲取座標位址 (QpointF.x,QpointF.y)
             point = self.ui.graphicsView.mapToScene(event.pos())
@@ -215,7 +217,7 @@ class roiwidge(QWidget):  # 介面布局自動縮放
                 if len(self.name) != self.rect_draw_count:
                     self.scene.removeItem(self.scene.items()[1])
                     self.rect_draw_count -= 1
-            self.ui.graphicsView.setScene(self.scene)
+            # self.ui.graphicsView.setScene(self.scene)
             QtWidgets.QApplication.restoreOverrideCursor()
         event.accept()
     # 當滑鼠點擊放開時
@@ -380,8 +382,11 @@ class roiwidge(QWidget):  # 介面布局自動縮放
         QtWidgets.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
         self.ui.tableWidget.clearContents()    # 清空頁面暫存
         self.ui.tableWidget.setRowCount(0)
-        self.points.clear()
-        self.name.clear()
+        del self.points
+        del self.name
+        gc.collect()
+        self.points = []
+        self.name = []
         self.clearJson() #need to change
         self.clearIMG() #need to change
         self.ROI_view.clear()
@@ -389,7 +394,6 @@ class roiwidge(QWidget):  # 介面布局自動縮放
         self.totname = 1
         toLog(f"ROI {self.channel} Updated")
         self.scene.clear()
-        self.ui.graphicsView.setScene(self.scene)
         self.changeAIConf()
         QtWidgets.QApplication.restoreOverrideCursor()
 
@@ -538,6 +542,7 @@ class roiwidge(QWidget):  # 介面布局自動縮放
             # init logging for roi pos
             self.tmp_multi = list()
             del draw
+            gc.collect()
             # json file logging
             self.ROI_pos_logging(point)
         # form
@@ -654,13 +659,13 @@ class roiwidge(QWidget):  # 介面布局自動縮放
         self.changeAIConf()
     
     def changeAIConf(self):
-        f = open('AiSettings.json', 'r')
+        f = open('./AiSettings.json', 'r')
         data = json.load(f)
         f.close()
 
         data[self.channel]['change'] = True
 
-        f = open('AiSettings.json', 'w')
+        f = open('./AiSettings.json', 'w')
         json.dump(data,f,indent=2)
         f.close()
 
@@ -733,8 +738,8 @@ class roiwidge(QWidget):  # 介面布局自動縮放
                 self.totname = 1
                 self.ClearAllROI()
 
-            self.ui.graphicsView.setScene(self.scene)
-            self.tmp_multi = list()
+            # self.ui.graphicsView.setScene(self.scene)
+            self.tmp_multi = []
             self.changeAIConf()
             data1 = open('output/loggin.json', 'w')
             json.dump(self.ROI_logging, data1, indent=2)

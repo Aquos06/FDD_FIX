@@ -17,8 +17,6 @@ from VideoStreamOriginal import WebcamVideoStream
 from allutility.falutil import Fallutil
 #import coordinate util
 from coorutil import specific, drawBbox, openJson, timetoint, NewDraw
-#import Yolov7
-from yolov7 import detect
 #import calculate
 from calculate import calculate
 
@@ -29,7 +27,6 @@ class Worker1(QObject):
     timenow = QtCore.pyqtSignal(str)
     koordinat = QtCore.pyqtSignal(np.ndarray,int)   
     config = QtCore.pyqtSignal(str,int) 
-    noCamera = QtCore.pyqtSignal(bool, int)
 
     def openconfig(self):
         camera1_change = False
@@ -139,7 +136,6 @@ class Worker1(QObject):
         self.detect = True
         self.total_people = [[0,0],[0,0],[0,0],[0,0]]  
 
-        self.yolov7 = detect()
         self.calculate = calculate()
 
         self.mask_fall1 = cv2.imread('./ROI/Camera1/fall_down.jpg')
@@ -167,9 +163,11 @@ class Worker1(QObject):
         
             if self.ROI['Camera3']['change'] == True:
                 self.mask_fall3 = cv2.imread('./ROI/Camera3/fall_down.jpg')
+                self.ROI['Camera3']['change'] = False
 
             if self.ROI['Camera4']['change'] == True:
                 self.mask_fall4 = cv2.imread('./ROI/Camera4/fall_down.jpg')
+                self.mask_fall4['Camera4']['change'] = False
 
             f = open('AiSettings.json', 'w')
             json.dump(self.ROI, f, indent=2)
@@ -345,124 +343,128 @@ class Worker1(QObject):
         self.img = np.zeros((2160,3840,3))
         self.noCam = cv2.imread('NoCamera.png')
         while True:
-            self.Jsonprep()
-            self.checkROI()
+            if self.berenti:
+                continue
 
-            while self.berenti:
-                time.sleep(0.1)
+            else: 
+                self.Jsonprep()
+                self.checkROI()
 
-            self.timenow.emit(self.time_now())
+                self.timenow.emit(self.time_now())
 
-            try:
-                if self.config_file['channel1']['change'] == True:
-                    self.openconfig()
-            except:
-                pass
+                try:
+                    if self.config_file['channel1']['change'] == True:
+                        self.openconfig()
+                except:
+                    pass
 
-            self.camera1Img = self.img1
-            self.camera2Img = self.img2
-            self.camera3Img = self.img3
-            self.camera4Img = self.img4
+                try :
+                    self.camera1Img = self.img1
+                    self.camera2Img = self.img2
+                    self.camera3Img = self.img3
+                    self.camera4Img = self.img4
 
-            self.img[:1080,:1920,:] = self.camera1Img
-            self.img[:1080,1920:,:] = self.camera2Img
-            self.img[1080:,:1920,:] = self.camera3Img
-            self.img[1080:,1920:,:] = self.camera4Img
+                    self.img[:1080,:1920,:] = self.camera1Img
+                    self.img[:1080,1920:,:] = self.camera2Img
+                    self.img[1080:,:1920,:] = self.camera3Img
+                    self.img[1080:,1920:,:] = self.camera4Img
+                except:
+                    pass
+                coordinate = self.yolov7.predict(self.img)
+                person, fall = self.specific(coordinate)
+                fall,_ = self.OCtrack.tracking(fall,self.img)
+                coordinate1, coordinate2, coordinate3, coordinate4 ,fall1, fall2, fall3, fall4 = self.separate(person, fall)
 
-            coordinate = self.yolov7.predict(self.img)
-            person, fall = self.specific(coordinate)
-            fall,_ = self.OCtrack.tracking(fall,self.img)
-            coordinate1, coordinate2, coordinate3, coordinate4 ,fall1, fall2, fall3, fall4 = self.separate(person, fall)
+                if len(fall) > 0:
+                    filename1 = self.findfall.final_fall(fall1, self.camera1Img, 1, self.function['function']['light_delay'])
+                    filename2 = self.findfall.final_fall(fall2, self.camera2Img, 2, self.function['function']['light_delay'])
+                    filename3 = self.findfall.final_fall(fall3, self.camera3Img, 3, self.function['function']['light_delay'])
+                    filename4 = self.findfall.final_fall(fall4, self.camera4Img, 4, self.function['function']['light_delay'])
 
-            filename1 = self.findfall.final_fall(fall1, self.camera1Img, 1, self.function['function']['light_delay'])
-            filename2 = self.findfall.final_fall(fall2, self.camera2Img, 2, self.function['function']['light_delay'])
-            filename3 = self.findfall.final_fall(fall3, self.camera3Img, 3, self.function['function']['light_delay'])
-            filename4 = self.findfall.final_fall(fall4, self.camera4Img, 4, self.function['function']['light_delay'])
+                    for file in filename1:
+                        self.fall.emit(file,1)
 
-            for file in filename1:
-                self.fall.emit(file,1)
-
-            for file in filename2:
-                self.fall.emit(file,2)
-            
-            for file in filename3:
-                self.fall.emit(file,3)
-
-            for file in filename4:
-                self.fall.emit(file,4)
-
-            try:
-                if self.config_file['channel1']['active'] == True:
-                    self.camera1Img = NewDraw(self.camera1Img, coordinate1, fall1)
+                    for file in filename2:
+                        self.fall.emit(file,2)
                     
-                    if self.config_file['channel1']['ROI'] == True: #ROI
-                        self.camera1Img = cv2.addWeighted(self.camera1Img, 1, self.mask_fall1, 0.3, 0)
+                    for file in filename3:
+                        self.fall.emit(file,3)
 
-                    if self.zoom['Channel1'] == True:
-                        self.screen.setPixmap(self.img2pyqt(self.camera1Img, self.screen))
+                    for file in filename4:
+                        self.fall.emit(file,4)
+
+                try:
+                    if self.config_file['channel1']['active'] == True:
+                        self.camera1Img = NewDraw(self.camera1Img, coordinate1, fall1)
+                        
+                        if self.config_file['channel1']['ROI'] == True: #ROI
+                            self.camera1Img = cv2.addWeighted(self.camera1Img, 1, self.mask_fall1, 0.3, 0)
+
+                        if self.zoom['Channel1'] == True:
+                            self.screen.setPixmap(self.img2pyqt(self.camera1Img, self.screen))
+                        else:
+                            self.channel1.setPixmap(self.img2pyqt(self.camera1Img, self.channel1))
+
+                        self.total_people[0][0] = len(fall1)
+                        self.total_people[0][1] = len(fall1) + len(coordinate1)
                     else:
-                        self.channel1.setPixmap(self.img2pyqt(self.camera1Img, self.channel1))
+                        self.channel1.setPixmap(self.img2pyqt(self.noCam, self.channel1))
+                except:
+                    pass
+                
+                try:
+                    if self.config_file['channel2']['active'] == True:
+                        self.camera2Img = NewDraw(self.camera2Img, coordinate2, fall2)
 
-                    self.total_people[0][0] = len(fall1)
-                    self.total_people[0][1] = len(fall1) + len(coordinate1)
-                else:
-                    self.channel1.setPixmap(self.img2pyqt(self.noCam, self.channel1))
-            except:
-                pass
-            
-            try:
-                if self.config_file['channel2']['active'] == True:
-                    self.camera2Img = NewDraw(self.camera2Img, coordinate2, fall2)
+                        if self.config_file['channel2']['ROI'] == True: #ROI
+                            self.camera2Img = cv2.addWeighted(self.camera2Img, 1, self.mask_fall2, 0.3, 0)
 
-                    if self.config_file['channel2']['ROI'] == True: #ROI
-                        self.camera2Img = cv2.addWeighted(self.camera2Img, 1, self.mask_fall2, 0.3, 0)
-
-                    if self.zoom['Channel2'] == True:
-                        self.screen.setPixmap(self.img2pyqt(self.camera2Img, self.screen))
+                        if self.zoom['Channel2'] == True:
+                            self.screen.setPixmap(self.img2pyqt(self.camera2Img, self.screen))
+                        else:
+                            self.channel2.setPixmap(self.img2pyqt(self.camera2Img, self.channel2))
+                        
+                        self.total_people[1][0] = len(fall2)
+                        self.total_people[1][1] = len(coordinate2) + len(fall2)
                     else:
-                        self.channel2.setPixmap(self.img2pyqt(self.camera2Img, self.channel2))
-                    
-                    self.total_people[1][0] = len(fall2)
-                    self.total_people[1][1] = len(coordinate2) + len(fall2)
-                else:
-                    self.channel2.setPixmap(self.img2pyqt(self.noCam, self.channel2))
-            except:
-                pass
+                        self.channel2.setPixmap(self.img2pyqt(self.noCam, self.channel2))
+                except:
+                    pass
 
-            try:
-                if self.config_file['channel3']['active'] == True:
-                    self.camera3Img = NewDraw(self.camera3Img, coordinate3, fall3)
+                try:
+                    if self.config_file['channel3']['active'] == True:
+                        self.camera3Img = NewDraw(self.camera3Img, coordinate3, fall3)
 
-                    if self.config_file['channel3']['ROI'] == True: #ROI
-                        self.camera3Img = cv2.addWeighted(self.camera1Img, 1, self.mask_fall3, 0.3, 0)
+                        if self.config_file['channel3']['ROI'] == True: #ROI
+                            self.camera3Img = cv2.addWeighted(self.camera1Img, 1, self.mask_fall3, 0.3, 0)
 
-                    if self.zoom['Channel3'] == True:
-                        self.screen.setPixmap(self.img2pyqt(self.camera3Img, self.screen))
+                        if self.zoom['Channel3'] == True:
+                            self.screen.setPixmap(self.img2pyqt(self.camera3Img, self.screen))
+                        else:
+                            self.channel3.setPixmap(self.img2pyqt(self.camera3Img, self.channel3))
+                        
+                        self.total_people[2][0] = len(fall3)
+                        self.total_people[2][1] = len(coordinate3) + len(fall3)
                     else:
-                        self.channel3.setPixmap(self.img2pyqt(self.camera3Img, self.channel3))
-                    
-                    self.total_people[2][0] = len(fall3)
-                    self.total_people[2][1] = len(coordinate3) + len(fall3)
-                else:
-                    self.channel3.setPixmap(self.img2pyqt(self.noCam, self.channel3))
-            except:
-                pass
-            
-            try:
-                if self.config_file['channel4']['active'] == True:
-                    self.camera4Img = NewDraw(self.camera4Img, coordinate4, fall4)
+                        self.channel3.setPixmap(self.img2pyqt(self.noCam, self.channel3))
+                except:
+                    pass
+                
+                try:
+                    if self.config_file['channel4']['active'] == True:
+                        self.camera4Img = NewDraw(self.camera4Img, coordinate4, fall4)
 
-                    if self.config_file['channel4']['ROI'] == True: #ROI
-                        self.camera4Img = cv2.addWeighted(self.camera4Img, 1, self.mask_fall4, 0.3, 0)
+                        if self.config_file['channel4']['ROI'] == True: #ROI
+                            self.camera4Img = cv2.addWeighted(self.camera4Img, 1, self.mask_fall4, 0.3, 0)
 
-                    if self.zoom['Channel4'] == True:
-                        self.screen.setPixmap(self.img2pyqt(self.camera4Img, self.screen))
+                        if self.zoom['Channel4'] == True:
+                            self.screen.setPixmap(self.img2pyqt(self.camera4Img, self.screen))
+                        else:
+                            self.channel4.setPixmap(self.img2pyqt(self.camera4Img, self.channel4))
+                        
+                        self.total_people[3][0] = len(fall4)
+                        self.total_people[3][1] = len(coordinate4) + len(fall4)
                     else:
-                        self.channel4.setPixmap(self.img2pyqt(self.camera4Img, self.channel4))
-                    
-                    self.total_people[3][0] = len(fall4)
-                    self.total_people[3][1] = len(coordinate4) + len(fall4)
-                else:
-                    self.channel4.setPixmap(self.img2pyqt(self.noCam, self.channel4))
-            except:
-                pass
+                        self.channel4.setPixmap(self.img2pyqt(self.noCam, self.channel4))
+                except:
+                    pass
