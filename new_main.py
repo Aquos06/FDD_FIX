@@ -25,7 +25,7 @@ from clickablefall import InfoDetails
 from utility import text, timetoint, setupLogin, toLog
 
 from worker1 import Worker1
-from httpUtil import get, post, getIpAddr
+from allutility.httpUtil import get, post, getIpAddr
 from VideoStream import WebcamVideoStream
 from yolov7 import detect
 

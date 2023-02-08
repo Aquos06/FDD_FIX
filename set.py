@@ -1,6 +1,6 @@
 from PyQt5 import QtWidgets
 from newsettingmain import Ui_MainWindow
-from httpUtil import get, getIpAddr, put
+from allutility.httpUtil import get, getIpAddr, put
 from utility import toLog
 from allutility.factoryreset import FactoryReset
 

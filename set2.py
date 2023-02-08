@@ -5,7 +5,7 @@ from dialog import Ui_Dialog
 from dialogbackup import Ui_Dialogb
 from allutility.timeAPI import setTime
 from allutility.factoryreset import FactoryReset
-from httpUtil import put
+from allutility.httpUtil import put
 from utility import toLog
 
 from contextlib import closing
