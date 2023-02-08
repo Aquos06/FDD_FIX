@@ -115,16 +115,12 @@ class Fallutil():
         self.deleteKey = []
         for key in self.fall_store:
             key_time_seconds = self.timetoint(int(self.fall_store[key]['time'][:2]), int(self.fall_store[key]['time'][3:5]), int(self.fall_store[key]['time'][-2:]))    
-            if time_now_seconds - key_time_seconds > 1:
-                if self.fall_store[key]['counter'] > self.fall_store[key]['counter']*int(3*int(self.fallRatio['ratio'])):
+            if time_now_seconds - key_time_seconds < 3:
+                # if self.fall_store[key]['counter'] > self.fall_store[key]['counter']*int(3*int(self.fallRatio['ratio'])):
+                if self.fall_store[key]['counter'] > 1:
                     self.fall_store[key]['pass'] = True
-            else:
-                self.deleteKey.append(key)
                 
         fallname = self.SaveFall()
-            
-        for i in self.deleteKey:
-            del self.fall_store[i]
 
         return fallname
     

@@ -13,7 +13,6 @@ import json
 import cv2
 import qdarkstyle
 import time 
-import gc
 
 from utility import toLog
 
@@ -382,11 +381,8 @@ class roiwidge(QWidget):  # 介面布局自動縮放
         QtWidgets.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
         self.ui.tableWidget.clearContents()    # 清空頁面暫存
         self.ui.tableWidget.setRowCount(0)
-        del self.points
-        del self.name
-        gc.collect()
-        self.points = []
-        self.name = []
+        self.points.clear()
+        self.name.clear()
         self.clearJson() #need to change
         self.clearIMG() #need to change
         self.ROI_view.clear()
@@ -542,7 +538,6 @@ class roiwidge(QWidget):  # 介面布局自動縮放
             # init logging for roi pos
             self.tmp_multi = list()
             del draw
-            gc.collect()
             # json file logging
             self.ROI_pos_logging(point)
         # form

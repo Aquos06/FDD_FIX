@@ -8,7 +8,6 @@ class biggerScreen(QtWidgets.QMainWindow):                                    #o
         super().__init__()
         self.ui = AnotherWindow()
         self.ui.setupUi(mainwindow)
-        self.image = cv2.imread('bg.jpg')
         self.ui.login.setText('back')
 
         

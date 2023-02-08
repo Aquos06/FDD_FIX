@@ -14,7 +14,6 @@ class InfoDetails(QtWidgets.QMainWindow):                                    #op
         self.ui = Details()
         self.ui.setupUi(self)
         self.go = False
-        self.image = cv2.imread('bg.jpg')
         f = open('personal.json', 'r')
         self.data = json.load(f)
         f.close()

@@ -63,9 +63,8 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         self.screen = 0
 
         self.img = cv2.imread('NoCamera.png')
+        self.ReconImg = cv2.imread('recon.png')
         setupLogin()
-        
-        self.bg = cv2.imread('bg.jpg')
 
         self.setSynctoTime()
         
@@ -507,28 +506,20 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
                 self.getAPI(timeNow,tanggal)
     
     def toImg(self, image):
-        # if self.worker1.berenti:
-        #     self.ROI1.setPixmap(self.img2pyqt(image,self.ROI1))
-        # else:
-            self.worker1.img1 = image
+        self.worker1.img1 = image
+        self.worker1.recon1 = False
             
     def toImg2(self,image):
-        # if self.worker1.berenti:
-        #     self.ROI2.setPixmap(self.img2pyqt(image,self.ROI2))
-        # else:
-            self.worker1.img2 = image
+        self.worker1.img2 = image
+        self.worker1.recon2 = False
             
     def toImg3(self,image):
-        # if self.worker1.berenti:
-        #     self.ROI3.setPixmap(self.img2pyqt(image,self.ROI3))
-        # else:
-            self.worker1.img3 = image
+        self.worker1.img3 = image
+        self.worker1.recon3 = False
 
     def toImg4(self,image):
-        # if self.worker1.berenti:
-        #     self.ROI4.setPixmap(self.img2pyqt(image,self.ROI4))
-        # else:
-            self.worker1.img4 = image
+        self.worker1.img4 = image
+        self.worker1.recon4 = False
   
     def reconnecting(self, hai,channel):
         if not hai:
@@ -540,9 +531,20 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
                 camera = 'channel3'
             else:
                 camera = 'channel4'
+
             if self.worker1.config_file[camera]['active'] == True:
-                img = cv2.imread('recon.png')
-                self.show(img,channel)
+                if channel == 1:
+                    self.worker1.img1 = self.ReconImg
+                    self.worker1.recon1 = True
+                elif channel == 2:
+                    self.worker1.img2 = self.ReconImg
+                    self.worker1.recon2 = True
+                elif channel == 3:
+                    self.worker1.img3 = self.ReconImg
+                    self.worker1.recon3 = True
+                else:
+                    self.worker1.img4 = self.ReconImg
+                    self.worker1.recon4 = True
 
     def makeDecoder1(self): 
         self.threadImg = QtCore.QThread()

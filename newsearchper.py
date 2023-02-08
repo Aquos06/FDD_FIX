@@ -15,7 +15,6 @@ import os
 import numpy as np
 import shutil
 import math
-import gc
 
 from utility import text, textforstat, toLog
 from components.searchBox import searchBox
@@ -23,10 +22,10 @@ from components.searchBox import searchBox
 count  = [0,1]
 
 class SearchPerson(QtWidgets.QMainWindow):
-    def __init__(self):
+    def __init__(self,mainwindow):
         super(SearchPerson,self).__init__() # in python3, super(Class, self).xxx = super().xxx
         self.ui = Ui_MainWindow()
-        self.ui.setupUi(self)
+        self.ui.setupUi(mainwindow)
         self.Searchresult = []
         self.det = Falling()
         self.det.ui.setupUi(self)
@@ -394,7 +393,8 @@ class SearchPerson(QtWidgets.QMainWindow):
                 item = layout.takeAt(0)
                 widget = item.widget()
                 if widget is not None:
-                    widget.setParent(None)
+                    # widget.setParent(None)
+                    # widget.close()
                     widget.deleteLater()
                 else:
                     self.clearLabel(item.layout())

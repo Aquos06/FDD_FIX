@@ -235,7 +235,7 @@ class Worker1(QObject):
         '''
         for i,coor in enumerate(coordinate):
             x1,y1,x2,y2,conf,classes = coor
-            coordinate[i][0] = x1 / 640 * 3840
+            coordinate[i][0] = x1 / 640 * 3840 #original 640
             coordinate[i][1] = y1 / 640 * 3840
             coordinate[i][2] = x2 / 640 * 3840
             coordinate[i][3] = y2 / 640 * 3840
@@ -257,38 +257,42 @@ class Worker1(QObject):
         for coor in person:
             if coor[0] < 1920:
                 if coor[1] < 1080:
-                    if self.config_file['channel1']['ROI'] == True:
-                        if self.calculate.find(self.mask_fall1, coor, person = True) == 1:
+                    if self.recon1 == False:
+                        if self.config_file['channel1']['ROI'] == True:
+                            if self.calculate.find(self.mask_fall1, coor, person = True) == 1:
+                                person1.append(coor)
+                        else:
                             person1.append(coor)
-                    else:
-                        person1.append(coor)
                 else:
                     coor[1] -= 1080
                     coor[3] -= 1080
-                    if self.config_file['channel3']['ROI'] == True:
-                        if self.calculate.find(self.mask_fall3, coor, person = True) == 1:
+                    if self.recon3 == False:
+                        if self.config_file['channel3']['ROI'] == True:
+                            if self.calculate.find(self.mask_fall3, coor, person = True) == 1:
+                                person3.append(coor)
+                        else:
                             person3.append(coor)
-                    else:
-                        person3.append(coor)
             else:
                 if coor[1] < 1080:
                     coor[0] -= 1920
                     coor[2] -= 1920
-                    if self.config_file['channel2']['ROI'] == True:
-                        if self.calculate.find(self.mask_fall2, coor, person = True) == 1:
+                    if self.recon2 == False:
+                        if self.config_file['channel2']['ROI'] == True:
+                            if self.calculate.find(self.mask_fall2, coor, person = True) == 1:
+                                person2.append(coor)
+                        else:
                             person2.append(coor)
-                    else:
-                        person2.append(coor)
                 else:
                     coor[0] -= 1920
                     coor[1] -= 1080
                     coor[2] -= 1920
                     coor[3] -= 1080
-                    if self.config_file['channel4']['ROI'] == True:
-                        if self.calculate.find(self.mask_fall4, coor, person = True) == 1:
+                    if self.recon4 == False:
+                        if self.config_file['channel4']['ROI'] == True:
+                            if self.calculate.find(self.mask_fall4, coor, person = True) == 1:
+                                person4.append(coor)
+                        else:
                             person4.append(coor)
-                    else:
-                        person4.append(coor)
 
         for coor in fall:
             if coor[1] < 1920:
