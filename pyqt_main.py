@@ -298,7 +298,10 @@ class roiwidge(QWidget):  # 介面布局自動縮放
         # 如果使用者想畫多邊形 ROI
         elif (flag == False and self.ui.comboBox.currentText() == 'draw MultiRect ROI' and pos == (0, 0) and size == (0, 0)) or (shape == 'Multi' and flag == True):
             if shape != 'Multi':
-                Pointed = [points[-2],points[-1]]
+                if len(points)> 1:
+                    Pointed = [points[-2],points[-1]]
+                else: 
+                    Pointed = points
                 if confirm:
                     frame = pg.PolyLineROI(Pointed, pen=pg.mkPen(self.penColor[len(self.name)%4-1], width = 4))
                 else:
@@ -317,7 +320,6 @@ class roiwidge(QWidget):  # 介面布局自動縮放
                 self.text = self.scene.addText(name, myFont)
                 self.text.setPos(points[0][0], points[0][1] - 30)
                 self.ROI_view[name].append(self.scene.items()[-1])
-        # self.ui.graphicsView.setScene(self.scene)
 
     def clearJson(self):
         f = open('output/loggin.json', 'r')
