@@ -115,8 +115,9 @@ class Fallutil():
         self.deleteKey = []
         for key in self.fall_store:
             key_time_seconds = self.timetoint(int(self.fall_store[key]['time'][:2]), int(self.fall_store[key]['time'][3:5]), int(self.fall_store[key]['time'][-2:]))    
-            if time_now_seconds - key_time_seconds < delay:
-                if int(self.fall_store[key]['counter']) >= (delay*int(2*int(self.fallRatio['ratio']))):
+            print(f"{time_now_seconds-key_time_seconds} < {delay}")
+            if (time_now_seconds - key_time_seconds) < delay:
+                if int(self.fall_store[key]['counter']) >= (delay*int(2*float(self.fallRatio['ratio']))):
                 # if self.fall_store[key]['counter'] > 1:
                     print(f"{int(self.fall_store[key]['counter'])} delay: {delay * int(2*float(self.fallRatio['ratio']))}")
                     self.fall_store[key]['pass'] = True
@@ -179,8 +180,8 @@ class Fallutil():
                 
                 # self.falldown += 1
 
-        for key in key_temp:
-            del self.fall_store[key]
+        # for key in key_temp:
+        #     del self.fall_store[key]
         
         if self.channel == 1:
             f = open('./falldown/all_falldown.json', "w")

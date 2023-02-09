@@ -235,17 +235,17 @@ class Worker1(QObject):
         '''
         for i,coor in enumerate(coordinate):
             x1,y1,x2,y2,conf,classes = coor
-            coordinate[i][0] = x1 / 640 * 3840 #original 640
-            coordinate[i][1] = y1 / 640 * 3840
-            coordinate[i][2] = x2 / 640 * 3840
-            coordinate[i][3] = y2 / 640 * 3840
+            coordinate[i][0] = x1 / 480 * 3840 #original 640
+            coordinate[i][1] = y1 / 480 * 3840
+            coordinate[i][2] = x2 / 480 * 3840
+            coordinate[i][3] = y2 / 480 * 3840
 
         for i,coor in enumerate(fall):
             Id,x1,y1,x2,y2 = coor
-            fall[i][1] = x1 / 640 * 3840
-            fall[i][2] = y1 / 640 * 3840
-            fall[i][3] = x2 / 640 * 3840
-            fall[i][4] = y2 / 640 * 3840
+            fall[i][1] = x1 / 480 * 3840
+            fall[i][2] = y1 / 480 * 3840
+            fall[i][3] = x2 / 480 * 3840
+            fall[i][4] = y2 / 480 * 3840
 
         return coordinate, fall
 
