@@ -384,14 +384,14 @@ class Ui_MainWindow(object):
         #############################################################################################################
         #############################################################################################################
         
-        self.scrollArea = QtWidgets.QScrollArea(self.frame_2)
+        # self.scrollArea = QtWidgets.QScrollArea(self.frame_2)
 
-        self.verticalScrollBar = QtWidgets.QScrollBar(QtCore.Qt.Vertical, self.scrollArea)
-        self.scrollArea.setVerticalScrollBar(self.verticalScrollBar)
-        self.scrollArea.setWidgetResizable(True)
-        self.scrollArea.setObjectName("scrollArea")
+        # self.verticalScrollBar = QtWidgets.QScrollBar(QtCore.Qt.Vertical, self.scrollArea)
+        # self.scrollArea.setVerticalScrollBar(self.verticalScrollBar)
+        # self.scrollArea.setWidgetResizable(True)
+        # self.scrollArea.setObjectName("scrollArea")
         
-        self.scrollAreaWidgetContents = QtWidgets.QWidget()
+        # self.scrollAreaWidgetContents = QtWidgets.QWidget()
         self.layout = QtWidgets.QVBoxLayout()
         self.layout.setSpacing(0)
 
@@ -401,24 +401,157 @@ class Ui_MainWindow(object):
         self.box1 = searchBox()
         self.box1.setMinimumHeight(200)
         self.AnsHorizontal1.addWidget(self.box1)
-
         self.box2 = searchBox()
         self.box2.setMinimumHeight(200)
         self.AnsHorizontal1.addWidget(self.box2)
-
         self.box3 = searchBox()
         self.box3.setMinimumHeight(200)
         self.AnsHorizontal1.addWidget(self.box3)
-
         self.box4 = searchBox()
         self.box4.setMinimumHeight(200)
         self.AnsHorizontal1.addWidget(self.box4)
 
+        self.layout.addLayout(self.AnsHorizontal1)
+        self.layout.addItem(spacerItem)
 
-        self.scrollAreaWidgetContents.setLayout(self.layout)
-        self.scrollArea.setWidget(self.scrollAreaWidgetContents)
+        self.AnsHorizontal2 = QtWidgets.QHBoxLayout()
+        self.AnsHorizontal2.setSpacing(0)
 
-        self.verticalLayout.addWidget(self.scrollArea)
+        self.box5 = searchBox()
+        self.box5.setMinimumHeight(200)
+        self.AnsHorizontal2.addWidget(self.box5)
+        self.box6 = searchBox()
+        self.box6.setMinimumHeight(200)
+        self.AnsHorizontal2.addWidget(self.box6)
+        self.box7 = searchBox()
+        self.box7.setMinimumHeight(200)
+        self.AnsHorizontal2.addWidget(self.box7)
+        self.box8 = searchBox()
+        self.box8.setMinimumHeight(200)
+        self.AnsHorizontal2.addWidget(self.box8)
+        
+        self.layout.addLayout(self.AnsHorizontal2)
+        self.layout.addItem(spacerItem)
+
+        self.AnsHorizontal3 = QtWidgets.QHBoxLayout()
+        self.AnsHorizontal3.setSpacing(0)
+
+        self.box9 = searchBox()
+        self.box9.setMinimumHeight(200)
+        self.AnsHorizontal3.addWidget(self.box9)
+        self.box10 = searchBox()
+        self.box10.setMinimumHeight(200)
+        self.AnsHorizontal3.addWidget(self.box10)
+        self.box11 = searchBox()
+        self.box11.setMinimumHeight(200)
+        self.AnsHorizontal3.addWidget(self.box11)
+        self.box12 = searchBox()
+        self.box12.setMinimumHeight(200)
+        self.AnsHorizontal3.addWidget(self.box12)
+        
+        self.layout.addLayout(self.AnsHorizontal3)
+        self.layout.addItem(spacerItem)
+
+        self.AnsHorizontal4 = QtWidgets.QHBoxLayout()
+        self.AnsHorizontal4.setSpacing(0)
+
+        self.box13 = searchBox()
+        self.box13.setMinimumHeight(200)
+        self.AnsHorizontal4.addWidget(self.box13)
+        self.box14 = searchBox()
+        self.box14.setMinimumHeight(200)
+        self.AnsHorizontal4.addWidget(self.box14)
+        self.box15 = searchBox()
+        self.box15.setMinimumHeight(200)
+        self.AnsHorizontal4.addWidget(self.box15)
+        self.box16 = searchBox()
+        self.box16.setMinimumHeight(200)
+        self.AnsHorizontal4.addWidget(self.box16)
+
+        self.layout.addLayout(self.AnsHorizontal4)
+        self.layout.addItem(spacerItem)
+
+        self.layout.setStretch(0,20)
+        self.layout.setStretch(1,1)
+        self.layout.setStretch(2,20)
+        self.layout.setStretch(3,1)
+        self.layout.setStretch(4,20)
+        self.layout.setStretch(5,1)
+        self.layout.setStretch(6,20)
+        self.layout.setStretch(7,1)
+
+        self.verticalLayout.addLayout(self.layout)
+
+        self.PageButton = QtWidgets.QHBoxLayout()
+        self.PageButton.setSpacing(0)
+
+        self.leftPage = QtWidgets.QPushButton()
+        self.leftPage.setText('<')
+        self.leftPage.setFont(font)
+        self.leftPage.setStyleSheet(""" 
+            QPushButton{
+                background-color: #4277BD;
+                color: white;
+                border-radius: 10px;
+            }
+            QPushButton:hover{
+                background-color: #499DD0;
+                border-radius:10px;
+            }
+        """)
+        self.leftPage.setDefault(True)
+        self.leftPage.setMaximumSize(QtCore.QSize(40,40))
+        self.leftPage.setMinimumSize(QtCore.QSize(40,40))
+        self.leftPage.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+
+        self.PageButton.addItem(spacerItem)
+        self.PageButton.addWidget(self.leftPage)
+
+        self.labelPage = QtWidgets.QLabel()
+        self.labelPage.setFont(font)
+        self.labelPage.setText("0/0")
+        self.labelPage.setStyleSheet("color:white")
+        
+        self.PageButton.addItem(spacerItem)
+        self.PageButton.addWidget(self.labelPage)
+        
+
+        self.rightPage = QtWidgets.QPushButton()
+        self.rightPage.setText(">")
+        self.rightPage.setFont(font)
+        self.rightPage.setStyleSheet(""" 
+            QPushButton{
+                background-color: #4277BD;
+                color: white;
+                border-radius: 10px;
+            }
+            QPushButton:hover{
+                background-color: #499DD0;
+                border-radius:10px;
+            }
+        """)
+        self.rightPage.setDefault(True)
+        self.rightPage.setMaximumSize(QtCore.QSize(40,40))
+        self.rightPage.setMinimumSize(QtCore.QSize(40,40))
+        self.leftPage.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+
+        self.PageButton.addItem(spacerItem)
+        self.PageButton.addWidget(self.rightPage)
+        self.PageButton.addItem(spacerItem)
+
+        self.PageButton.setStretch(0,10)
+        self.PageButton.setStretch(1,1)
+        self.PageButton.setStretch(2,10)
+        self.PageButton.setStretch(3,1)
+        self.PageButton.setStretch(4,10)
+        self.PageButton.setStretch(5,1)
+        self.PageButton.setStretch(6,10)
+
+        self.verticalLayout.addLayout(self.PageButton)
+
+        self.verticalLayout.setStretch(0,20)
+        self.verticalLayout.setStretch(1,1)
+
         self.horizontalLayout_2.addLayout(self.verticalLayout)
 
         self.verticalLayout_5.addLayout(self.horizontalLayout_2)

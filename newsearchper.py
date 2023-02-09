@@ -31,13 +31,39 @@ class SearchPerson(QtWidgets.QMainWindow):
         self.det.ui.setupUi(self)
         self.det.ui.rightButton.clicked.connect(self.rightButton)
         self.det.ui.leftButton.clicked.connect(self.leftButton)
+        self.ui.leftPage.clicked.connect(self.Left)
+        self.ui.rightPage.clicked.connect(self.Right)
         self.setup_control()  
-        self.awal = 0 #first number to display
+        self.awal = 1 #first number to display
         self.now = 0#index displayed in big screen  
         self.everShow = False
         self.range = 10
 
+        self.box = [self.ui.box1, self.ui.box2, self.ui.box3, self.ui.box4, self.ui.box5, self.ui.box6, self.ui.box7, self.ui.box8, self.ui.box9 
+                ,self.ui.box10, self.ui.box11, self.ui.box12, self.ui.box13, self.ui.box14, self.ui.box15, self.ui.box16]
+
+        self.path = './falldown/screenshot'
+        self.pathcut = './falldown/cut'
+
+        self.blank = cv2.imread('./ROI/Camera1/blank.jpg')
+
         self.jsoninit()
+
+    def Left(self):
+        if self.awal - 16 > 0:
+            QtWidgets.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
+            self.awal -= 16
+            self.ui.labelPage.setText(f"{math.ceil(self.awal/16)} / {math.ceil(len(self.Searchresult)/16)}")
+            self.setIcon()
+            QtWidgets.QApplication.restoreOverrideCursor()
+
+    def Right(self):
+        if self.awal + 16 < len(self.Searchresult):
+            QtWidgets.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
+            self.awal += 16
+            self.ui.labelPage.setText(f"{math.ceil(self.awal/16)} / {math.ceil(len(self.Searchresult)/16)}")
+            self.setIcon()
+            QtWidgets.QApplication.restoreOverrideCursor()
 
     def back(self):
         self.det.ui.close()
@@ -159,9 +185,6 @@ class SearchPerson(QtWidgets.QMainWindow):
         self.ui.endtime.setDateTime(QtCore.QDateTime(QtCore.QDate.currentDate(), QtCore.QTime(17, 0, 0)))
         self.ui.enddate.setMaximumDate(QDate.currentDate())
 
-        self.ui.verticalScrollBar.valueChanged.connect(lambda: self.do_action())
-        self.ui.verticalScrollBar.rangeChanged.connect(lambda: self.ui.verticalScrollBar.setMaximum(self.range))
-  
     def do_action(self):
 
         if math.floor(self.ui.verticalScrollBar.value()/175) > self.awal :
@@ -329,87 +352,41 @@ class SearchPerson(QtWidgets.QMainWindow):
         temp = QtGui.QImage(frame, frame.shape[1], frame.shape[0], frame.shape[1]*3, QtGui.QImage.Format_RGB888)
         return QtGui.QPixmap.fromImage(temp).scaled(label.width(), label.height())
 
-    def makeperSeven(self,filenames):
-        path = './falldown/screenshot'
-        pathcut = './falldown/cut'
-        vertical = QtWidgets.QVBoxLayout()
-        horizontal = QtWidgets.QHBoxLayout()
-        horizontal.setSpacing(0)
-        for index,i in enumerate(reversed(filenames)):
-            if i != str(0):
-                box = searchBox()
-                box.label.setIcon(QtGui.QIcon(os.path.join(path,i)))
-                box.label.setIconSize(QtCore.QSize(400,200))
-                box.setMinimumHeight(200)
-                box.label.clicked.connect(lambda _, text = i : self.showDetail(text))
-                cut = cv2.imread(os.path.join(pathcut,i))
-                box.labelcut.setPixmap(self.img2pyqt(cut,box.labelcut))
-                event,date,time,channel = self.fromfilename(i)
-                box.information.setText(textforstat(event,date,time,channel))
-                horizontal.addWidget(box)
-            else:
-                box = searchBox()
-                horizontal.addWidget(box)
-        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        vertical.addLayout(horizontal)
-        vertical.addItem(spacerItem)
-
-        vertical.setStretch(0,20)
-        vertical.setStretch(1,1)
-
-        self.ui.layout.addLayout(vertical)
-
-    def listtoSeven(self,lists,first, perRow):
-        a = np.zeros(((first*perRow)-len(lists))).astype(int)
-        b = np.array([lists])
-        c = np.append(a,b)
-
-        return c.tolist()
-
     def setIcon(self):
-        perRow = 4
-        if len(self.Searchresult) == 0:
-            self.noresult()
-        else: 
-            first = int(len(self.Searchresult)/perRow)+1
-            self.newresult = self.listtoSeven(self.Searchresult,first,perRow)
-            self.newresult = np.array([self.newresult])
-            self.newresult = self.newresult.reshape(first,perRow) #2 dimension array for search box
-            for index,i in enumerate(reversed(self.newresult)):
-                if index == 6:
-                    break
-                self.makeperSeven(i)
+        for index,i in enumerate(self.box):
+            try:
+                filename = self.Searchresult[-(self.awal+index)]
+                i.label.setIcon(QtGui.QIcon(os.path.join(self.path,filename)))
+                i.label.setIconSize(QtCore.QSize(400,200))
+                i.label.clicked.connect(lambda _, text= filename : self.showDetail(text))
+                cut = cv2.imread(os.path.join(self.pathcut,filename))
+                i.labelcut.setPixmap(self.img2pyqt(cut, i.labelcut))
+                event,date,time,channel = self.fromfilename(filename)
+                i.information.setText(textforstat(event,date,time,channel))
+            except:
+                i.label.setIcon(QtGui.QIcon("./ROI/Camera1/blank.jpg"))
+                i.labelcut.setPixmap(self.img2pyqt(self.blank, i.labelcut))
+                i.information.setText("")
 
-    def cleardata(self):
-        self.Searchresult.clear()
-        for i in range(self.ui.layout.count()):
-            layout = self.ui.layout.itemAt(i)
-            self.clearLabel(self.ui.layout)
-            self.ui.layout.removeItem(layout)
-
-    def clearLabel(self,layout):
-        if layout is not None:
-            while layout.count():
-                item = layout.takeAt(0)
-                widget = item.widget()
-                if widget is not None:
-                    # widget.setParent(None)
-                    # widget.close()
-                    widget.deleteLater()
-                else:
-                    self.clearLabel(item.layout())
+    def clearResult(self):
+        for i in self.box:
+            i.label.setIcon(QtGui.QIcon("./ROI/Camera1/blank.jpg"))
+            i.labelcut.setPixmap(self.img2pyqt(self.blank, i.labelcut))
+            i.information.setText("")
 
     def searchReady(self):
         QtWidgets.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
-        self.cleardata()
+        self.Searchresult.clear()
         self.mainSearch()
+        self.awal = 1
         toLog("Search Fall down results")
-        self.awal = 0
-        if len(self.Searchresult) / 4 > 4:
-            self.range = ((len(self.Searchresult) / 4)+1) * 180 
+        if len(self.Searchresult) == 0 :
+            self.noresult()
+            self.clearResult()
+            self.ui.labelPage.setText(f"0 / 0")
         else:
-            self.range = 0
-        self.setIcon()
+            self.setIcon()
+            self.ui.labelPage.setText(f" 1 / {math.ceil(len(self.Searchresult)/16)}")
         QtWidgets.QApplication.restoreOverrideCursor()
 
     def mainSearch(self):
