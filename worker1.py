@@ -380,10 +380,10 @@ class Worker1(QObject):
                 coordinate1, coordinate2, coordinate3, coordinate4 ,fall1, fall2, fall3, fall4 = self.separate(person, fall)
 
                 if len(fall) > 0:
-                    filename1 = self.findfall.final_fall(fall1, self.camera1Img, 1, self.function['function']['light_delay'])
-                    filename2 = self.findfall.final_fall(fall2, self.camera2Img, 2, self.function['function']['light_delay'])
-                    filename3 = self.findfall.final_fall(fall3, self.camera3Img, 3, self.function['function']['light_delay'])
-                    filename4 = self.findfall.final_fall(fall4, self.camera4Img, 4, self.function['function']['light_delay'])
+                    filename1 = self.findfall.final_fall(fall1, self.camera1Img, 1, int(self.function['function']['light_delay']))
+                    filename2 = self.findfall.final_fall(fall2, self.camera2Img, 2, int(self.function['function']['light_delay']))
+                    filename3 = self.findfall.final_fall(fall3, self.camera3Img, 3, int(self.function['function']['light_delay']))
+                    filename4 = self.findfall.final_fall(fall4, self.camera4Img, 4, int(self.function['function']['light_delay']))
 
                     for file in filename1:
                         self.fall.emit(file,1)

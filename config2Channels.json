@@ -5,7 +5,7 @@
     "user": "admin",
     "password": "ai123456",
     "active": true,
-    "ROI": true,
+    "ROI": false,
     "change": false
   },
   "channel2": {
@@ -47,7 +47,7 @@
   "async": {
     "time": 10,
     "date": "2023-02-02",
-    "last": "11:51:04",
+    "last": "14:04:27",
     "enable": true
   },
   "deviceID": 137

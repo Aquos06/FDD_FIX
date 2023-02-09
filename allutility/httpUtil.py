@@ -77,9 +77,9 @@ def post(url, params, contentType='application/json', token=None):
   headers = {"cache-control": "no-cache", "Content-Type": contentType}
   if(token is not None):
     headers['Authorization'] = 'Bearer ' + token
-  print(url)
-  print(data)
-  print(headers)
+  # print(url)
+  # print(data)
+  # print(headers)
   try:
     response = requests.post(url, data=data, headers=headers)
     resStatus = response.status_code

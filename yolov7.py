@@ -15,7 +15,7 @@ class detect():
     def __init__(self):
         set_logging()
         self.device = select_device('0')
-        self.model = attempt_load('best.pt', map_location= self.device)
+        self.model = attempt_load('exp18.pt', map_location= self.device)
         self.model(torch.zeros(1, 3, 640, 640).to(self.device).type_as(next(self.model.parameters())))
         # self.model = TracedModel(self.model, self.device, 640)
         self.model.half()
@@ -68,7 +68,7 @@ class detect():
 
         with torch.no_grad():
             self.pred = self.model(self.img, augment = False)[0]
-            self.pred = non_max_suppression(self.pred, 0.6,0.45,agnostic=True)
+            self.pred = non_max_suppression(self.pred, 0.45,0.45,agnostic=True)
 
         self.pred = self.pred[0].cpu().tolist()
 
