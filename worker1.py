@@ -442,7 +442,6 @@ class Worker1(QObject):
 
                         if self.config_file['channel3']['ROI'] == True: #ROI
                             self.camera3Img = cv2.addWeighted(self.camera3Img, 1, self.mask_fall3, 0.3, 0)
-                            print(3)
 
                         if self.zoom['Channel3'] == True:
                             self.screen.setPixmap(self.img2pyqt(self.camera3Img, self.screen))
@@ -462,7 +461,6 @@ class Worker1(QObject):
 
                         if self.config_file['channel4']['ROI'] == True: #ROI
                             self.camera4Img = cv2.addWeighted(self.camera4Img, 1, self.mask_fall4, 0.3, 0)
-                            print(4)
 
                         if self.zoom['Channel4'] == True:
                             self.screen.setPixmap(self.img2pyqt(self.camera4Img, self.screen))
