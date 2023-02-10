@@ -14,7 +14,7 @@ class InfoDetails(QtWidgets.QMainWindow):                                    #op
         self.ui = Details()
         self.ui.setupUi(self)
         self.go = False
-        f = open('personal.json', 'r')
+        f = open('json/personal.json', 'r')
         self.data = json.load(f)
         f.close()
         

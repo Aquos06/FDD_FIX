@@ -261,10 +261,10 @@ class Ui_MainWindowp(object):
 
         self.login.setText(_translate("MainWindow", "Login"))
         
-        self.lchannel3.setPixmap(self.img2pyqt_2("recon.png",self.lchannel3))       
-        self.lchannel3.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter)
-        self.lchannel4.setPixmap(self.img2pyqt_2("recon.png",self.lchannel4))       
-        self.lchannel4.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter)
+        # self.lchannel3.setPixmap(self.img2pyqt_2("recon.png",self.lchannel3))       
+        # self.lchannel3.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter)
+        # self.lchannel4.setPixmap(self.img2pyqt_2("recon.png",self.lchannel4))       
+        # self.lchannel4.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter)
         
         self.labelTotal.setText(_translate("MainWindow", "<font color = red>跌倒</font>："))
         self.labelNum.setText(_translate("MainWindow", "<font color=red>0</font> "))

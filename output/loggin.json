@@ -1,0 +1,53 @@
+{
+  "Camera1": {
+    "person": {},
+    "PPE": {},
+    "fall down": {
+      "MultiRect_1": {
+        "coor": [
+          [
+            789,
+            367
+          ],
+          [
+            940,
+            351
+          ],
+          [
+            1285,
+            1047
+          ],
+          [
+            737,
+            1029
+          ]
+        ],
+        "enable": true,
+        "color": 0
+      }
+    },
+    "maximum": {},
+    "minimum": {}
+  },
+  "Camera2": {
+    "person": {},
+    "PPE": {},
+    "fall down": {},
+    "maximum": {},
+    "minimum": {}
+  },
+  "Camera3": {
+    "person": {},
+    "PPE": {},
+    "fall down": {},
+    "maximum": {},
+    "minimum": {}
+  },
+  "Camera4": {
+    "person": {},
+    "PPE": {},
+    "fall down": {},
+    "maximum": {},
+    "minimum": {}
+  }
+}

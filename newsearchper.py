@@ -16,7 +16,7 @@ import numpy as np
 import shutil
 import math
 
-from utility import text, textforstat, toLog
+from allutility.utility import text, textforstat, toLog
 from components.searchBox import searchBox
 
 count  = [0,1]

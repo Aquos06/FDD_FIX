@@ -13,7 +13,7 @@ from new_main import TwoScreen
 from AISetting.AISettings import AiSettings
 from ZoomScreen.biggerscreen import biggerScreen
 from settings.log import Log
-from utility import toLog
+from allutility.utility import toLog
 
 import sys
 import json
@@ -62,7 +62,7 @@ class Screen2(QMainWindow): #CCTV
         
         global Maincctv
         Maincctv= TwoScreen(self)
-        f = open(".json/personal.json", "r")
+        f = open("json/personal.json", "r")
         self.data = json.load(f)
         f.close()
         global Settings_4

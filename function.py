@@ -3,7 +3,7 @@ from functionmain2 import Ui_MainWindow
 from dialogsure import Ui_Dialog
 from Timetable.TableTime import TimeSelect
 
-from utility import toLog
+from allutility.utility import toLog
 from allutility.factoryreset import FactoryReset
 
 import json

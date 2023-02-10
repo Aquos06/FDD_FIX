@@ -14,7 +14,7 @@ import cv2
 import qdarkstyle
 import time 
 
-from utility import toLog
+from allutility.utility import toLog
 
 class roiwidge(QWidget):  # 介面布局自動縮放
     def __init__(self,parent=None):

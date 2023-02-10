@@ -1,7 +1,7 @@
 {
   "channel1": {
     "place": "\u5927\u9580",
-    "ip": "192.168.0.142",
+    "ip": "192.168.0.51",
     "user": "admin",
     "password": "ai123456",
     "active": true,
@@ -47,7 +47,7 @@
   "async": {
     "time": 10,
     "date": "2023-02-02",
-    "last": "09:55:26",
+    "last": "13:19:36",
     "enable": true
   },
   "deviceID": 137

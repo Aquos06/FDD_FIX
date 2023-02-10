@@ -11,8 +11,6 @@ from datetime import datetime
 
 #import trackking
 from track import Trackker 
-#import video stream
-from VideoStreamOriginal import WebcamVideoStream
 #import calculate fall
 from allutility.falutil import Fallutil
 #import coordinate util

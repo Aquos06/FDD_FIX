@@ -9,7 +9,7 @@ import json
 import logging
 import logging.handlers
 import threading
-import RPi.GPIO as GPIO
+# import RPi.GPIO as GPIO
 import base64
 from datetime import date,datetime
 
@@ -19,10 +19,10 @@ from PyQt5.QtWidgets import QMainWindow,QWidget
 
 
 from newtwochannel2 import Ui_MainWindowp
-from playsound import playsound
+# from playsound import playsound
 from components.falldownbox import Box
 from clickablefall import InfoDetails
-from utility import text, timetoint, setupLogin, toLog
+from allutility.utility import text, timetoint, setupLogin, toLog
 
 from worker1 import Worker1
 from allutility.httpUtil import get, post, getIpAddr
@@ -52,7 +52,7 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         Ui_MainWindowp.__init__(self)
         
         self.setupUi(mainwindow)
-        self.cpBlanktoROI()
+        # self.cpBlanktoROI()
 
         self.InfoDetails = InfoDetails()
         self.yolov7 = detect()
@@ -68,7 +68,7 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
 
         self.setSynctoTime()
         
-        self.tempJsonClear()        
+        # self.tempJsonClear()        
         self.startThread()
 
     def setSynctoTime(self):
@@ -195,22 +195,22 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         self.InfoDetails.input(image_ss,image,date,time,channel,type)
         self.InfoDetails.ui.back.clicked.connect(self.back2)
     
-    def sound(self): 
-        playsound('voice/no_pass.mp3')
+    # def sound(self): 
+    #     playsound('voice/no_pass.mp3')
 
-    def GPIO(self):  
+    # def GPIO(self):  
         
-        GPIO.setmode(GPIO.BOARD)
-        GPIO.setup(16, GPIO.OUT, initial = GPIO.HIGH)
-        if self.light1:
-            GPIO.output(16, GPIO.LOW)
-        if self.gate1:
-            GPIO.output(16, GPIO.LOW)
-        time.sleep(self.lightDelay)
-        if self.light1:
-            GPIO.output(16, GPIO.HIGH)
-        if self.gate1:
-            GPIO.output(16, GPIO.HIGH)
+    #     GPIO.setmode(GPIO.BOARD)
+    #     GPIO.setup(16, GPIO.OUT, initial = GPIO.HIGH)
+    #     if self.light1:
+    #         GPIO.output(16, GPIO.LOW)
+    #     if self.gate1:
+    #         GPIO.output(16, GPIO.LOW)
+    #     time.sleep(self.lightDelay)
+    #     if self.light1:
+    #         GPIO.output(16, GPIO.HIGH)
+    #     if self.gate1:
+    #         GPIO.output(16, GPIO.HIGH)
 
     def GPIOon(self):
         tgpio = threading.Thread(target = self.GPIO)
@@ -356,7 +356,7 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         for index,i in enumerate(zoom_json):
             zoom_json[i] = False
 
-        f = open('zoom.json', 'w')
+        f = open('json/zoom.json', 'w')
         json.dump(zoom_json, f, indent=2)
         f.close()
         
@@ -668,7 +668,7 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         
         # self.asyncAPI(time_now)
         # self.rePost(self)
-        self.checkDetect(time_now)
+        # self.checkDetect(time_now)
         
     def rePost(self):
         f = open('json/InternetProb.json','r')
