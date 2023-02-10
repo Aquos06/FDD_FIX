@@ -8,10 +8,8 @@
 *.csv
 /background
 /build
-/factoryreset
 /file
 /img
-/json
 /ttest
 /falldown
 /temp_falldown

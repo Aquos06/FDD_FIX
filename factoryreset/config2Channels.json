@@ -1,0 +1,53 @@
+{
+  "channel1": {
+    "place": "\u5927\u9580",
+    "ip": "192.168.0.53",
+    "user": "admin",
+    "password": "ai123456",
+    "active": false,
+    "ROI": false,
+    "change": false
+  },
+  "channel2": {
+    "place": "\u5927\u95802",
+    "ip": "192.168.0.53",
+    "user": "admin",
+    "password": "ai123456",
+    "active": false,
+    "ROI": false,
+    "change": false
+  },
+  "channel3": {
+    "place": "\u5927\u95803",
+    "ip": "192.168.0.51",
+    "user": "admin",
+    "password": "ai123456",
+    "active": false,
+    "ROI": false,
+    "change": false
+  },
+  "channel4": {
+    "place": "\u5927\u95804",
+    "ip": "192.168.0.51",
+    "user": "admin",
+    "password": "ai123456",
+    "active": false,
+    "ROI": false,
+    "change": false
+  },
+  "utils": {
+    "storage": "imgcapture",
+    "width": "1920",
+    "height": "1080",
+    "storageMethod": false
+  },
+  "backup": {
+    "user_path": ""
+  },
+  "async": {
+    "time" : 10,
+    "last": "00:00:00",
+    "enable" : true
+  },
+  "deviceID": 137
+}
