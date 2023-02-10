@@ -115,11 +115,9 @@ class Fallutil():
         self.deleteKey = []
         for key in self.fall_store:
             key_time_seconds = self.timetoint(int(self.fall_store[key]['time'][:2]), int(self.fall_store[key]['time'][3:5]), int(self.fall_store[key]['time'][-2:]))    
-            print(f"{time_now_seconds-key_time_seconds} < {delay}")
             if (time_now_seconds - key_time_seconds) < delay:
                 if int(self.fall_store[key]['counter']) >= (delay*int(2*float(self.fallRatio['ratio']))):
                 # if self.fall_store[key]['counter'] > 1:
-                    print(f"{int(self.fall_store[key]['counter'])} delay: {delay * int(2*float(self.fallRatio['ratio']))}")
                     self.fall_store[key]['pass'] = True
                 
         fallname = self.SaveFall()

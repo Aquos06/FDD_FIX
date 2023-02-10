@@ -16,7 +16,7 @@ from VideoStreamOriginal import WebcamVideoStream
 #import calculate fall
 from allutility.falutil import Fallutil
 #import coordinate util
-from coorutil import specific, drawBbox, openJson, timetoint, NewDraw
+from allutility.coorutil import specific, drawBbox, openJson, timetoint, NewDraw
 #import calculate
 from calculate import calculate
 
@@ -235,17 +235,17 @@ class Worker1(QObject):
         '''
         for i,coor in enumerate(coordinate):
             x1,y1,x2,y2,conf,classes = coor
-            coordinate[i][0] = x1 / 480 * 3840 #original 640
-            coordinate[i][1] = y1 / 480 * 3840
-            coordinate[i][2] = x2 / 480 * 3840
-            coordinate[i][3] = y2 / 480 * 3840
+            coordinate[i][0] = x1 / 640 * 3840 #original 640
+            coordinate[i][1] = y1 / 640 * 3840
+            coordinate[i][2] = x2 / 640 * 3840
+            coordinate[i][3] = y2 / 640 * 3840
 
         for i,coor in enumerate(fall):
             Id,x1,y1,x2,y2 = coor
-            fall[i][1] = x1 / 480 * 3840
-            fall[i][2] = y1 / 480 * 3840
-            fall[i][3] = x2 / 480 * 3840
-            fall[i][4] = y2 / 480 * 3840
+            fall[i][1] = x1 / 640 * 3840
+            fall[i][2] = y1 / 640 * 3840
+            fall[i][3] = x2 / 640 * 3840
+            fall[i][4] = y2 / 640 * 3840
 
         return coordinate, fall
 
@@ -374,6 +374,7 @@ class Worker1(QObject):
                     self.img[1080:,1920:,:] = self.camera4Img
                 except:
                     pass
+
                 coordinate = self.yolov7.predict(self.img)
                 person, fall = self.specific(coordinate)
                 fall,_ = self.OCtrack.tracking(fall,self.img)
@@ -440,7 +441,8 @@ class Worker1(QObject):
                         self.camera3Img = NewDraw(self.camera3Img, coordinate3, fall3)
 
                         if self.config_file['channel3']['ROI'] == True: #ROI
-                            self.camera3Img = cv2.addWeighted(self.camera1Img, 1, self.mask_fall3, 0.3, 0)
+                            self.camera3Img = cv2.addWeighted(self.camera3Img, 1, self.mask_fall3, 0.3, 0)
+                            print(3)
 
                         if self.zoom['Channel3'] == True:
                             self.screen.setPixmap(self.img2pyqt(self.camera3Img, self.screen))
@@ -460,6 +462,7 @@ class Worker1(QObject):
 
                         if self.config_file['channel4']['ROI'] == True: #ROI
                             self.camera4Img = cv2.addWeighted(self.camera4Img, 1, self.mask_fall4, 0.3, 0)
+                            print(4)
 
                         if self.zoom['Channel4'] == True:
                             self.screen.setPixmap(self.img2pyqt(self.camera4Img, self.screen))

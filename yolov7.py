@@ -15,15 +15,15 @@ class detect():
     def __init__(self):
         set_logging()
         self.device = select_device('0')
-        self.model = attempt_load('exp18.pt', map_location= self.device)
-        self.model(torch.zeros(1, 3, 480, 480).to(self.device).type_as(next(self.model.parameters())))
+        self.model = attempt_load('best.pt', map_location= self.device)
+        self.model(torch.zeros(1, 3, 640, 640).to(self.device).type_as(next(self.model.parameters())))
         # self.model = TracedModel(self.model, self.device, 640)
         self.model.half()
 
         self.names = self.model.module.names if hasattr(self.model, 'module') else self.model.names
         self.colors = [[random.randint(0,255) for _ in range(3)] for _ in self.names]
 
-    def letterbox(self,img, new_shape=(480, 480), color=(114, 114, 114), auto=True, scaleFill=False, scaleup=True, stride=32): #original 640
+    def letterbox(self,img, new_shape=(640, 640), color=(114, 114, 114), auto=True, scaleFill=False, scaleup=True, stride=32): #original 640
         # Resize and pad image while meeting stride-multiple constraints
         shape = img.shape[:2]  # current shape [height, width]
         if isinstance(new_shape, int):

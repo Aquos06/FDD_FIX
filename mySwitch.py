@@ -32,3 +32,4 @@ class MySwitch(QtWidgets.QPushButton):
             sw_rect.moveLeft(-width)
         painter.drawRoundedRect(sw_rect, radius, radius)
         painter.drawText(sw_rect, Qt.AlignCenter, label)
+        painter.end()
