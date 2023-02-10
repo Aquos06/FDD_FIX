@@ -62,7 +62,7 @@ class Screen2(QMainWindow): #CCTV
         
         global Maincctv
         Maincctv= TwoScreen(self)
-        f = open("personal.json", "r")
+        f = open(".json/personal.json", "r")
         self.data = json.load(f)
         f.close()
         global Settings_4
@@ -77,7 +77,7 @@ class Screen2(QMainWindow): #CCTV
         Maincctv.lastSync = Settings_2.ui.syncTime
             
         def foo1(*args, **kwargs):
-            f = open('config2Channels.json','r')
+            f = open('json/config2Channels.json','r')
             data = json.load(f)
             f.close()            
             if data['channel1']['active'] == True:
@@ -87,7 +87,7 @@ class Screen2(QMainWindow): #CCTV
                 widget.setCurrentWidget(screen9)
 
         def foo2(*args, **kwargs):
-            f = open('config2Channels.json','r')
+            f = open('json/config2Channels.json','r')
             data = json.load(f)
             f.close()  
             if data['channel2']['active'] == True:
@@ -97,7 +97,7 @@ class Screen2(QMainWindow): #CCTV
                 widget.setCurrentWidget(screen9)
 
         def foo3(*args, **kwargs):
-            f = open('config2Channels.json','r')
+            f = open('json/config2Channels.json','r')
             data = json.load(f)
             f.close()  
             if data['channel3']['active'] == True:
@@ -107,7 +107,7 @@ class Screen2(QMainWindow): #CCTV
                 widget.setCurrentWidget(screen9)
 
         def foo4(*args, **kwargs):
-            f = open('config2Channels.json','r')
+            f = open('json/config2Channels.json','r')
             data = json.load(f)
             f.close()  
             if data['channel4']['active'] == True:
@@ -271,13 +271,13 @@ class Screen6(QMainWindow): #password
     def gotonext(self):
         if self.uipass.lineEdit_3.text() == 'admin' and self.uipass.lineEdit_4.text() == 'admin':
 
-            f = open('personal.json', 'r')
+            f = open('json/personal.json', 'r')
             self.data = json.load(f)
             f.close()
             
             self.data['loggedIn'] = True
             
-            f = open('personal.json', 'w')
+            f = open('json/personal.json', 'w')
             json.dump(self.data,f,indent=2)
             f.close()
             

@@ -476,13 +476,13 @@ class roiwidge(QWidget):  # 介面布局自動縮放
             json.dump(self.ROI_logging, f, indent=2)
             f.close()
 
-            f = open('AiSettings.json', 'r')
+            f = open('json/AiSettings.json', 'r')
             data = json.load(f)
             f.close()
 
             data[self.channel]['change'] = True
 
-            f = open('AiSettings.json', 'w')
+            f = open('json/AiSettings.json', 'w')
             json.dump(data,f,indent=2)
             f.close()
 
@@ -597,7 +597,7 @@ class roiwidge(QWidget):  # 介面布局自動縮放
         else:
             cv2.imwrite('./ROI/Camera4/fall_down.jpg', blank)
 
-        f = open('AiSettings.json', 'r')
+        f = open('json/AiSettings.json', 'r')
         data = json.load(f)
         f.close()
 
@@ -605,7 +605,7 @@ class roiwidge(QWidget):  # 介面布局自動縮放
 
         toLog(f"ROI {self.channel} Updated")
 
-        f = open('AiSettings.json', 'w')
+        f = open('json/AiSettings.json', 'w')
         json.dump(data,f,indent=2)
         f.close()
 
@@ -656,13 +656,13 @@ class roiwidge(QWidget):  # 介面布局自動縮放
         self.changeAIConf()
     
     def changeAIConf(self):
-        f = open('./AiSettings.json', 'r')
+        f = open('./json/AiSettings.json', 'r')
         data = json.load(f)
         f.close()
 
         data[self.channel]['change'] = True
 
-        f = open('./AiSettings.json', 'w')
+        f = open('./json/AiSettings.json', 'w')
         json.dump(data,f,indent=2)
         f.close()
 

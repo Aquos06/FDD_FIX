@@ -11,7 +11,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt, QRect
 import sys
-from mySwitch import MySwitch
+from components.mySwitch import MySwitch
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):

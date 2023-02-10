@@ -72,13 +72,13 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         self.startThread()
 
     def setSynctoTime(self):
-        f = open('config2Channels.json','r')
+        f = open('json/config2Channels.json','r')
         data = json.load(f)
         f.close()
 
         data['async']['last'] = time.strftime("%H:%M:%S")
 
-        f = open('config2Channels.json', 'w')
+        f = open('json/config2Channels.json', 'w')
         json.dump(data,f,indent=2)
         f.close()
 
@@ -147,7 +147,7 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
             "Channel3": False,
             "Channel4": False
 }
-        f = open('zoom.json','w')
+        f = open('json/zoom.json','w')
         json.dump(data,f,indent=2)
         f.close()
     
@@ -246,7 +246,7 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         f.close()
         
 
-        f = open('function.json', 'r')
+        f = open('json/function.json', 'r')
         GPIOData = json.load(f)
         f.close()
 
@@ -272,7 +272,7 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         self.totalFall += 1
         self.labelNum.setText(f'<font color=red>{self.totalFall}</font> ')
 
-        f = open('zoom.json','r')
+        f = open('json/zoom.json','r')
         datazoom = json.load(f)
         f.close()
         
@@ -303,7 +303,7 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         
         capture_at = round(time.time() * 1000.0)
 
-        f = open('config2Channels.json','r')
+        f = open('json/config2Channels.json','r')
         data = json.load(f)
         f.close()
      
@@ -331,7 +331,7 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         return data
     
     def zoom_show(self,channel):        
-        f = open('zoom.json', 'r')
+        f = open('json/zoom.json', 'r')
         zoom_json = json.load(f)
         f.close()
         
@@ -344,12 +344,12 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         elif channel == 4:
             zoom_json['Channel4'] = True
 
-        f = open('zoom.json', 'w')
+        f = open('json/zoom.json', 'w')
         json.dump(zoom_json, f, indent= 2)
         f.close()
                 
     def back(self):
-        f = open('zoom.json', 'r')
+        f = open('json/zoom.json', 'r')
         zoom_json = json.load(f)
         f.close()
         
@@ -427,7 +427,7 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
             toLog('Fail to Sync with server')
             return
         
-        f = open('config2Channels.json', 'r')
+        f = open('json/config2Channels.json', 'r')
         data = json.load(f)
         f.close()
 
@@ -478,7 +478,7 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
 
         timeJSon = dataAPI['result'][0]['settings']['Time-Table']
 
-        f = open('config2Channels.json', 'w')
+        f = open('json/config2Channels.json', 'w')
         json.dump(data,f,indent=2)
         f.close()
 
@@ -490,7 +490,7 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
 
     def asyncAPI(self,timeNow):
         try:
-            f = open('config2Channels.json', 'r')
+            f = open('json/config2Channels.json', 'r')
             data = json.load(f)
             f.close()
         except:
@@ -553,7 +553,7 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         self.worker.change = False
         self.worker.moveToThread(self.threadImg)
         
-        f = open('config2Channels.json' , 'r')
+        f = open('json/config2Channels.json' , 'r')
         data = json.load(f)
         f.close()
 
@@ -573,7 +573,7 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         self.videoStream.change = False
         self.videoStream.moveToThread(self.threadImg2)
  
-        f = open('config2Channels.json', 'r')
+        f = open('json/config2Channels.json', 'r')
         data = json.load(f)
         f.close()
 
@@ -593,7 +593,7 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         self.videoStream3.change = False
         self.videoStream3.moveToThread(self.threadImg3)
  
-        f = open('config2Channels.json', 'r')
+        f = open('json/config2Channels.json', 'r')
         data = json.load(f)
         f.close()
 
@@ -613,7 +613,7 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         self.videoStream4.change = False
         self.videoStream4.moveToThread(self.threadImg4)
  
-        f = open('config2Channels.json', 'r')
+        f = open('json/config2Channels.json', 'r')
         data = json.load(f)
         f.close()
 
@@ -658,7 +658,7 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         self.thread1.start()
 
     def writetime(self, time_now):
-        f = open('function.json','r')
+        f = open('json/function.json','r')
         data = json.load(f)
         f.close()
         self.time.setText(time_now)

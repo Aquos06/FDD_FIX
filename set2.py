@@ -75,7 +75,7 @@ class SystemSet2(QtWidgets.QMainWindow):
 
     def setupData(self):
 
-        f = open('config2Channels.json', 'r')
+        f = open('./json/config2Channels.json', 'r')
         data = json.load(f)
         f.close()
 
@@ -93,7 +93,7 @@ class SystemSet2(QtWidgets.QMainWindow):
         f.close()
         self.ui.IpInput.setText(data['ipaddress'])
 
-        f = open('config2Channels.json','r')
+        f = open('json/config2Channels.json','r')
         data = json.load(f)
         f.close()
 
@@ -158,7 +158,7 @@ class SystemSet2(QtWidgets.QMainWindow):
             self.ui.TimeButton.setEnabled(True)
 
     def checksync(self):
-        f = open('config2Channels.json','r')
+        f = open('json/config2Channels.json','r')
         data = json.load(f)
         f.close()
         if self.ui.asyncSwitch.isChecked():
@@ -170,13 +170,13 @@ class SystemSet2(QtWidgets.QMainWindow):
         f.close()
 
     def storeTime(self):
-        f = open('config2Channels.json', 'r')
+        f = open('json/config2Channels.json', 'r')
         data = json.load(f)
         f.close()
 
         data["async"]['time'] = self.ui.spin_time.value()
 
-        f = open('config2Channels.json', 'w')
+        f = open('json/config2Channels.json', 'w')
         json.dump(data,f,indent=2)
         f.close()
 
@@ -220,7 +220,7 @@ class SystemSet2(QtWidgets.QMainWindow):
         nxconfig = json.load(f)
         f.close()
 
-        f = open('config2Channels.json','r')
+        f = open('json/config2Channels.json','r')
         CamConfig = json.load(f)
         f.close()
 
@@ -424,7 +424,7 @@ class SystemSet2(QtWidgets.QMainWindow):
     def buttonClicked(self):
         
         path  = self.ui.path.text()
-        fp  = open('config2Channels.json','r')
+        fp  = open('json/config2Channels.json','r')
         data = json.load(fp)
         fp.close()
 
@@ -432,18 +432,18 @@ class SystemSet2(QtWidgets.QMainWindow):
         if(self.ui.cover.currentText() == '停止'): data["utils"]["storageMethod"] = True
         else: data["utils"]["storageMethod"] = False
         
-        fp = open('config2Channels.json', 'w')
+        fp = open('json/config2Channels.json', 'w')
         json.dump(data, fp, indent=2)
         fp.close()
 
     def browsefile(self):
         fname = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
         self.ui.path.setText(fname)
-        f = open('config2Channels.json','r')
+        f = open('json/config2Channels.json','r')
         data = json.load(f)
         f.close()
         data['backup']['user_path'] = fname
-        f = open('config2Channels.json', 'w')
+        f = open('json/config2Channels.json', 'w')
         json.dump(data,f,indent=2)
         f.close()
 

@@ -1,5 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-from mySwitch import MySwitch
+from components.mySwitch import MySwitch
 
 
 class AiCamSettings(QtWidgets.QWidget):

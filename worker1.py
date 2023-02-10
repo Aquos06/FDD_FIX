@@ -102,12 +102,12 @@ class Worker1(QObject):
         self.config_file['channel4']['change'] = False
 
 
-        f = open('config2Channels.json', 'w')
+        f = open('./json/config2Channels.json', 'w')
         json.dump(self.config_file, f, indent=2)
         f.close()
              
     def openCam(self):
-        f = open('config2Channels.json','r')
+        f = open('./json/config2Channels.json','r')
         config = json.load(f)
         f.close()
 
@@ -128,7 +128,7 @@ class Worker1(QObject):
         self.password4 = config['channel4']['password']        
         
     def prep(self):
-        self.config_file = openJson('config2Channels.json')
+        self.config_file = openJson('./json/config2Channels.json')
         self.OCtrack = Trackker()
         self.OCtrack.preparation()
         
@@ -146,10 +146,10 @@ class Worker1(QObject):
         self.openCam()
     
     def Jsonprep(self):
-        self.function = openJson('function.json')
-        self.ROI = openJson('AiSettings.json')
-        self.config_file = openJson('config2Channels.json')
-        self.zoom = openJson('zoom.json')
+        self.function = openJson('./json/function.json')
+        self.ROI = openJson('./json/AiSettings.json')
+        self.config_file = openJson('./json/config2Channels.json')
+        self.zoom = openJson('./json/zoom.json')
 
     def checkROI(self):
         try:
@@ -169,7 +169,7 @@ class Worker1(QObject):
                 self.mask_fall4 = cv2.imread('./ROI/Camera4/fall_down.jpg')
                 self.mask_fall4['Camera4']['change'] = False
 
-            f = open('AiSettings.json', 'w')
+            f = open('./json/AiSettings.json', 'w')
             json.dump(self.ROI, f, indent=2)
             f.close()      
         except: 
@@ -178,7 +178,7 @@ class Worker1(QObject):
     def checkMin(self):
         try: 
             if self.config_file['channel1']['ROI'] == True:
-                f = open('AiSettings.json', 'r')
+                f = open('./json/AiSettings.json', 'r')
                 data = json.load(f)
                 f.close()
 
@@ -442,7 +442,6 @@ class Worker1(QObject):
 
                         if self.config_file['channel3']['ROI'] == True: #ROI
                             self.camera3Img = cv2.addWeighted(self.camera3Img, 1, self.mask_fall3, 0.3, 0)
-                            print(3)
 
                         if self.zoom['Channel3'] == True:
                             self.screen.setPixmap(self.img2pyqt(self.camera3Img, self.screen))
@@ -462,7 +461,6 @@ class Worker1(QObject):
 
                         if self.config_file['channel4']['ROI'] == True: #ROI
                             self.camera4Img = cv2.addWeighted(self.camera4Img, 1, self.mask_fall4, 0.3, 0)
-                            print(4)
 
                         if self.zoom['Channel4'] == True:
                             self.screen.setPixmap(self.img2pyqt(self.camera4Img, self.screen))

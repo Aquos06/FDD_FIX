@@ -56,7 +56,7 @@ class SettingFunction(QtWidgets.QMainWindow):
         self.timeTable.ui.show()
 
     def backup_function(self):
-        f = open('function.json', 'r')
+        f = open('json/function.json', 'r')
         content = json.load(f)
         f.close()
         
@@ -86,8 +86,8 @@ class SettingFunction(QtWidgets.QMainWindow):
 
     def buttonClicked(self):
 
-        fp  = open('function.json','r')
-        statusfp  = open('set.json','r')
+        fp  = open('json/function.json','r')
+        statusfp  = open('json/set.json','r')
         data = json.load(fp)
         setStatus = json.load(statusfp)
         fp.close()
@@ -118,8 +118,8 @@ class SettingFunction(QtWidgets.QMainWindow):
 
         setStatus["setStatus"] = True
 
-        fp = open('function.json', 'w')
-        statusfp = open('set.json', 'w')
+        fp = open('json/function.json', 'w')
+        statusfp = open('json/set.json', 'w')
         json.dump(data, fp, indent=2)
         json.dump(setStatus, statusfp, indent=2)
         fp.close()
