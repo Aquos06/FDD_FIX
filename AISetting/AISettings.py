@@ -1,7 +1,7 @@
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QApplication
 from .AISettingsMain import Ui_MainWindow
-from utility import toLog
+from allutility.utility import toLog
 from allutility.factoryreset import FactoryReset
 
 import sys

@@ -3,11 +3,12 @@ from functionmain2 import Ui_MainWindow
 from dialogsure import Ui_Dialog
 from Timetable.TableTime import TimeSelect
 
-from utility import toLog
+from allutility.utility import toLog
 from allutility.factoryreset import FactoryReset
 
 import json
 class SettingFunction(QtWidgets.QMainWindow):
+    FuncChange = False
     def __init__(self,mainwindow):
         super().__init__() # in python3, super(Class, self).xxx = super().xxx
         self.ui = Ui_MainWindow()
@@ -117,6 +118,8 @@ class SettingFunction(QtWidgets.QMainWindow):
             data['function']['Camera4'] = False
 
         setStatus["setStatus"] = True
+
+        SettingFunction.FuncChange = True
 
         fp = open('function.json', 'w')
         statusfp = open('set.json', 'w')

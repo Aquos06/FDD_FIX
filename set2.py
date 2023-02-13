@@ -6,7 +6,7 @@ from dialogbackup import Ui_Dialogb
 from allutility.timeAPI import setTime
 from allutility.factoryreset import FactoryReset
 from allutility.httpUtil import put
-from utility import toLog
+from allutility.utility import toLog
 
 from contextlib import closing
 from socket import socket, AF_INET, SOCK_DGRAM

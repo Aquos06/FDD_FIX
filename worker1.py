@@ -16,9 +16,16 @@ from VideoStreamOriginal import WebcamVideoStream
 #import calculate fall
 from allutility.falutil import Fallutil
 #import coordinate util
-from allutility.coorutil import specific, drawBbox, openJson, timetoint, NewDraw
+from allutility.coorutil import openJson, NewDraw
 #import calculate
 from calculate import calculate
+
+#import statics Settings
+from set import SystemSet
+#import statics Function
+from function import SettingFunction
+#import statics ROI
+from pyqt_main import roiwidge
 
 class Worker1(QObject):
     
@@ -143,35 +150,21 @@ class Worker1(QObject):
         self.mask_fall3 = cv2.imread('./ROI/Camera3/fall_down.jpg')
         self.mask_fall4 = cv2.imread('./ROI/Camera4/fall_down.jpg')
 
+        self.Jsonprep()
         self.openCam()
     
     def Jsonprep(self):
         self.function = openJson('function.json')
         self.ROI = openJson('AiSettings.json')
         self.config_file = openJson('config2Channels.json')
-        self.zoom = openJson('zoom.json')
+        # self.zoom = openJson('zoom.json')
 
     def checkROI(self):
         try:
-            if self.ROI['Camera1']['change'] == True:
-                self.mask_fall1 = cv2.imread('./ROI/Camera1/fall_down.jpg')
-                self.ROI['Camera1']['change'] = False
-
-            if self.ROI['Camera2']['change'] == True:
-                self.mask_fall2 = cv2.imread('./ROI/Camera2/fall_down.jpg')
-                self.ROI['Camera2']['change'] = False
-        
-            if self.ROI['Camera3']['change'] == True:
-                self.mask_fall3 = cv2.imread('./ROI/Camera3/fall_down.jpg')
-                self.ROI['Camera3']['change'] = False
-
-            if self.ROI['Camera4']['change'] == True:
-                self.mask_fall4 = cv2.imread('./ROI/Camera4/fall_down.jpg')
-                self.mask_fall4['Camera4']['change'] = False
-
-            f = open('AiSettings.json', 'w')
-            json.dump(self.ROI, f, indent=2)
-            f.close()      
+            self.mask_fall1 = cv2.imread('./ROI/Camera1/fall_down.jpg')
+            self.mask_fall2 = cv2.imread('./ROI/Camera2/fall_down.jpg')
+            self.mask_fall3 = cv2.imread('./ROI/Camera3/fall_down.jpg')
+            self.mask_fall4 = cv2.imread('./ROI/Camera4/fall_down.jpg')
         except: 
             return
 
@@ -351,8 +344,18 @@ class Worker1(QObject):
                 continue
 
             else: 
-                self.Jsonprep()
-                self.checkROI()
+                if SystemSet.CamChange:
+                    self.config_file = openJson('config2Channels.json')
+                    self.openconfig()
+                    print('read Camera Config')
+                    SystemSet.CamChange = False
+                if SettingFunction.FuncChange:
+                    self.function = openJson('function.json')         
+                    SettingFunction.FuncChange = False
+                if roiwidge.ROIChange:
+                    self.ROI = openJson('AiSettings.json')
+                    self.checkROI()
+                    roiwidge.ROIChange = False       
 
                 self.timenow.emit(self.time_now())
 
@@ -405,7 +408,7 @@ class Worker1(QObject):
                         if self.config_file['channel1']['ROI'] == True: #ROI
                             self.camera1Img = cv2.addWeighted(self.camera1Img, 1, self.mask_fall1, 0.3, 0)
 
-                        if self.zoom['Channel1'] == True:
+                        if self.Zoom1:
                             self.screen.setPixmap(self.img2pyqt(self.camera1Img, self.screen))
                         else:
                             self.channel1.setPixmap(self.img2pyqt(self.camera1Img, self.channel1))
@@ -424,7 +427,7 @@ class Worker1(QObject):
                         if self.config_file['channel2']['ROI'] == True: #ROI
                             self.camera2Img = cv2.addWeighted(self.camera2Img, 1, self.mask_fall2, 0.3, 0)
 
-                        if self.zoom['Channel2'] == True:
+                        if self.Zoom2:
                             self.screen.setPixmap(self.img2pyqt(self.camera2Img, self.screen))
                         else:
                             self.channel2.setPixmap(self.img2pyqt(self.camera2Img, self.channel2))
@@ -443,7 +446,7 @@ class Worker1(QObject):
                         if self.config_file['channel3']['ROI'] == True: #ROI
                             self.camera3Img = cv2.addWeighted(self.camera3Img, 1, self.mask_fall3, 0.3, 0)
 
-                        if self.zoom['Channel3'] == True:
+                        if self.Zoom3:
                             self.screen.setPixmap(self.img2pyqt(self.camera3Img, self.screen))
                         else:
                             self.channel3.setPixmap(self.img2pyqt(self.camera3Img, self.channel3))
@@ -462,7 +465,7 @@ class Worker1(QObject):
                         if self.config_file['channel4']['ROI'] == True: #ROI
                             self.camera4Img = cv2.addWeighted(self.camera4Img, 1, self.mask_fall4, 0.3, 0)
 
-                        if self.zoom['Channel4'] == True:
+                        if self.Zoom4:
                             self.screen.setPixmap(self.img2pyqt(self.camera4Img, self.screen))
                         else:
                             self.channel4.setPixmap(self.img2pyqt(self.camera4Img, self.channel4))

@@ -13,10 +13,11 @@ from new_main import TwoScreen
 from AISetting.AISettings import AiSettings
 from ZoomScreen.biggerscreen import biggerScreen
 from settings.log import Log
-from utility import toLog
+from allutility.utility import toLog
 
 import sys
 import json
+import sqlite3
 
 
 class Screen1(QMainWindow):
@@ -387,7 +388,7 @@ class Screen9(QMainWindow):
         BiggerScreen.ui.login.clicked.connect(self.goBack)
         
         Maincctv.worker1.screen = BiggerScreen.ui.screen
-        Maincctv.layoutbig = BiggerScreen.ui.layout
+        Maincctv.scrollArea = BiggerScreen.ui.scrollArea
         
     def goBack(self):
         Maincctv.back()
@@ -459,6 +460,5 @@ widget.addWidget(screen10)
 
 widget.setCurrentWidget(screen2)
 widget.showFullScreen()
-
 
 sys.exit(app.exec_())

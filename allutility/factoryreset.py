@@ -7,7 +7,7 @@ from .timeAPI import setTime
 from contextlib import closing
 from socket import socket, AF_INET, SOCK_DGRAM
 from time import ctime
-from utility import toLog
+from allutility.utility import toLog
 
 def setWaktu(server):
 

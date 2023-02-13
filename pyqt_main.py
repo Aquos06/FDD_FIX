@@ -14,9 +14,10 @@ import cv2
 import qdarkstyle
 import time 
 
-from utility import toLog
+from allutility.utility import toLog
 
 class roiwidge(QWidget):  # 介面布局自動縮放
+    ROIChange = False
     def __init__(self,parent=None):
         super(roiwidge, self).__init__(parent)
         self.ui = Ui_Form(self)
@@ -392,7 +393,8 @@ class roiwidge(QWidget):  # 介面布局自動縮放
         self.totname = 1
         toLog(f"ROI {self.channel} Updated")
         self.scene.clear()
-        self.changeAIConf()
+        # self.changeAIConf()
+        roiwidge.ROIChange = True
         QtWidgets.QApplication.restoreOverrideCursor()
 
     # ROI位址紀錄 pos : 矩形: [top_x, top_y , bottom_x, bottom_y]
@@ -476,15 +478,17 @@ class roiwidge(QWidget):  # 介面布局自動縮放
             json.dump(self.ROI_logging, f, indent=2)
             f.close()
 
-            f = open('AiSettings.json', 'r')
-            data = json.load(f)
-            f.close()
+            roiwidge.ROIChange = True
 
-            data[self.channel]['change'] = True
+            # f = open('AiSettings.json', 'r')
+            # data = json.load(f)
+            # f.close()
 
-            f = open('AiSettings.json', 'w')
-            json.dump(data,f,indent=2)
-            f.close()
+            # data[self.channel]['change'] = True
+
+            # f = open('AiSettings.json', 'w')
+            # json.dump(data,f,indent=2)
+            # f.close()
 
         except:
             print('Failed to save ROI...')
@@ -653,7 +657,8 @@ class roiwidge(QWidget):  # 介面布局自動縮放
         
         self.ui.tableWidget.setCellWidget(a,2,widgetEnable)
 
-        self.changeAIConf()
+        roiwidge.ROIChange = True
+        # self.changeAIConf()
     
     def changeAIConf(self):
         f = open('./AiSettings.json', 'r')
@@ -737,7 +742,8 @@ class roiwidge(QWidget):  # 介面布局自動縮放
 
             # self.ui.graphicsView.setScene(self.scene)
             self.tmp_multi = []
-            self.changeAIConf()
+            roiwidge.ROIChange = True
+            # self.changeAIConf()
             data1 = open('output/loggin.json', 'w')
             json.dump(self.ROI_logging, data1, indent=2)
             data1.close()

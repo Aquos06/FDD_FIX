@@ -4,14 +4,23 @@ import os
 import json
 from datetime import date,datetime
 import shutil
+import sqlite3
 
 class Fallutil():
 
     def __init__(self):
         self.today = date.today()
         self.today = str(self.today)
-
         self.today= self.editdate()
+        self.store = {
+            "Camera1": {},
+            "Camera2": {},
+            "Camera3": {},
+            "Camera4": {}
+        }
+        
+        self.con = sqlite3.connect("fall_database.db")
+        self.database = self.con.cursor()
         
     def final_fall(self,fall_coor,image,channel,delay):
         self.channel = channel
@@ -20,31 +29,16 @@ class Fallutil():
         ratio.close()
         
         if channel == 1:
-            f = open('./temp_falldown/fall_store.json', 'r')
+            self.kunci = "Camera1"
         elif channel == 2:
-            f = open('./temp_falldown/fall_store2.json', 'r')
+            self.kunci = "Camera2"
         elif channel == 3:
-            f = open('./temp_falldown/fall_store3.json', 'r')
+            self.kunci = "Camera3"
         else:
-            f = open('./temp_falldown/fall_store4.json', 'r')
-            
-        self.fall_store = json.load(f)
-        f.close()    
+            self.kunci = "Camera4"
             
         self.checkInBox(fall_coor,image,channel)
         fallname = self.check_VFall(delay)
-        
-        
-        if channel == 1:
-            f = open('temp_falldown/fall_store.json', 'w')
-        elif channel == 2:
-            f = open('temp_falldown/fall_store2.json','w')
-        elif channel == 3:
-            f = open('temp_falldown/fall_store3.json', 'w')
-        else:
-            f = open('temp_falldown/fall_store4.json','w')
-        json.dump(self.fall_store, f, indent= 2)
-        f.close()
         
         return fallname
         
@@ -57,7 +51,7 @@ class Fallutil():
         return strtoday
     
     def checkKey(self,id,channel):
-        for key in self.fall_store:
+        for key in self.store[self.kunci]:
             if key[27:] == str(id) and key[25] == str(channel):
                 self.key = key
                 return True
@@ -79,8 +73,8 @@ class Fallutil():
             
             if self.checkKey(int(personId),channel):
                 time_now = time.strftime("%H%M%S")
-                self.fall_store[self.key]['time'] = time_now[:2] + ":" + time_now[2:4] + ":" + time_now[-2:]
-                self.fall_store[self.key]['counter'] += 1
+                self.store[self.kunci][self.key]['time'] = time_now[:2] + ":" + time_now[2:4] + ":" + time_now[-2:]
+                self.store[self.kunci][self.key]['counter'] += 1
             else:
                 new_data = {
                     f"{self.today}_{time_now}_channel{channel}_{int(personId)}" :{
@@ -102,7 +96,7 @@ class Fallutil():
                     print('Failed to Save Falldown Image...')
                 else:
                     print('Saving FallDown Image: Sucess...')
-                self.fall_store.update(new_data)
+                self.store[self.kunci].update(new_data)
 
      
     def timetoint(self,hour,minute,second):
@@ -113,12 +107,11 @@ class Fallutil():
         time_now = datetime.now()
         time_now_seconds = self.timetoint(time_now.hour, time_now.minute, time_now.second)
         self.deleteKey = []
-        for key in self.fall_store:
-            key_time_seconds = self.timetoint(int(self.fall_store[key]['time'][:2]), int(self.fall_store[key]['time'][3:5]), int(self.fall_store[key]['time'][-2:]))    
+        for key in self.store[self.kunci]:
+            key_time_seconds = self.timetoint(int(self.store[self.kunci][key]['time'][:2]), int(self.store[self.kunci][key]['time'][3:5]), int(self.store[self.kunci][key]['time'][-2:]))    
             if (time_now_seconds - key_time_seconds) < delay:
-                if int(self.fall_store[key]['counter']) >= (delay*int(2*float(self.fallRatio['ratio']))):
-                # if self.fall_store[key]['counter'] > 1:
-                    self.fall_store[key]['pass'] = True
+                if int(self.store[self.kunci][key]['counter']) >= (delay*int(2*float(self.fallRatio['ratio']))):
+                    self.store[self.kunci][key]['pass'] = True
                 
         fallname = self.SaveFall()
 
@@ -131,23 +124,11 @@ class Fallutil():
         fixed_path = './falldown/cut'
         fixed_path_ss = './falldown/screenshot'
         
-        if self.channel == 1:
-            self.path = 'falldown/all_falldown.json' 
-        elif self.channel == 2:
-            self.path = 'falldown/all_falldown2.json'
-        elif self.channel == 3:
-            self.path = 'falldown/all_falldown3.json'
-        elif self.channel == 4:
-            self.path = 'falldown/all_falldown4.json'  
-
-        with open(self.path, 'r') as j:
-            self.fall_data = json.loads(j.read())
-        
         key_temp = []
         
-        for key in self.fall_store:
-            if self.fall_store[key]['pass'] == True and self.fall_store[key]['saved'] == False:
-                self.fall_store[key]['saved'] = True
+        for key in self.store[self.kunci]:
+            if self.store[self.kunci][key]['pass'] == True and self.store[self.kunci][key]['saved'] == False:
+                self.store[self.kunci][key]['saved'] = True
                 key = key + ".jpg"
                 
                 if shutil.disk_usage("./falldown").free < 1000:
@@ -164,33 +145,23 @@ class Fallutil():
                 
                 key = key[:-4]
                 
-                newdata = {
-                    key : {
-                        "event": self.fall_store[key]["event"],
-                        "date" : self.fall_store[key]["date"],
-                        "time" : self.fall_store[key]["time"],
-                        "channel": self.fall_store[key]["channel"]
-                    }
-                }    
+                event = self.store[self.kunci][key]["event"]
+                tanggal =  self.store[self.kunci][key]["date"]
+                waktu =  self.store[self.kunci][key]["time"]
+                dateTime = tanggal + " " +waktu
+                channel = self.store[self.kunci][key]["channel"]
             
-                self.fall_data.update(newdata)
-                key_temp.append(key)
+                query = f"""
+                INSERT INTO fall (FileName, Event, DateTime, channel)
+                VALUES ('{key}', '{event}', '{dateTime}', '{channel}')
+                """
                 
-                # self.falldown += 1
-
-        # for key in key_temp:
-        #     del self.fall_store[key]
-        
-        if self.channel == 1:
-            f = open('./falldown/all_falldown.json', "w")
-        elif self.channel == 2:
-            f = open('./falldown/all_falldown2.json', 'w')
-        elif self.channel == 3:
-            f = open('./falldown/all_falldown3.json', 'w')
-        elif self.channel == 4:
-            f = open('./falldown/all_falldown4.json', 'w')   
+                self.database.execute(query)
+                self.database.commit()
             
-        json.dump(self.fall_data, f, indent=2)
-        f.close()
+                key_temp.append(key)
+
+        for key in key_temp:
+            del self.store[self.kunci][key]
 
         return key_temp
