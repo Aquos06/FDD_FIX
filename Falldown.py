@@ -17,6 +17,7 @@ from allutility.utility import toLog
 
 import sys
 import json
+import sqlite3
 
 
 class Screen1(QMainWindow):
@@ -459,6 +460,5 @@ widget.addWidget(screen10)
 
 widget.setCurrentWidget(screen2)
 widget.showFullScreen()
-
 
 sys.exit(app.exec_())

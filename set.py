@@ -11,6 +11,7 @@ from datetime import datetime
 SERVER_GIVE_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsiZmFjZWFpIl0sInNjb3BlIjpbImFwaS1zZXJ2aWNlIl0sImV4cCI6MTkyMTE1MzI1OCwiYXV0aG9yaXRpZXMiOlsiYWl1bmlvbiJdLCJqdGkiOiI3ODI3YTBkYi0zMGQ3LTRhODItYjQyYy0yMTQ0NTMyZWRlNDEiLCJjbGllbnRfaWQiOiJhcGktY2xpZW50In0.mE8WnaGzVuWhS5LfT0ajQcBr_JP2TUOVfhch-5dJ6mA'
 
 class SystemSet(QtWidgets.QMainWindow):
+    CamChange = False
     def __init__(self,mainwindow):
         super().__init__() # in python3, super(Class, self).xxx = super().xxx
         self.ui = Ui_MainWindow()
@@ -325,6 +326,8 @@ class SystemSet(QtWidgets.QMainWindow):
         f = open('./json/config2Channels.json', 'w')
         json.dump(self.data,f,indent=2)
         f.close()
+        
+        SystemSet.CamChange = True
         
         toLog("Camera Settings Updated")
         self.putAPI()

@@ -15,6 +15,7 @@ import os
 import numpy as np
 import shutil
 import math
+import sqlite3
 
 from allutility.utility import text, textforstat, toLog
 from components.searchBox import searchBox
@@ -22,10 +23,10 @@ from components.searchBox import searchBox
 count  = [0,1]
 
 class SearchPerson(QtWidgets.QMainWindow):
-    def __init__(self,mainwindow):
+    def __init__(self):
         super(SearchPerson,self).__init__() # in python3, super(Class, self).xxx = super().xxx
         self.ui = Ui_MainWindow()
-        self.ui.setupUi(mainwindow)
+        self.ui.setupUi(self)
         self.Searchresult = []
         self.det = Falling()
         self.det.ui.setupUi(self)
@@ -47,7 +48,7 @@ class SearchPerson(QtWidgets.QMainWindow):
 
         self.blank = cv2.imread('./ROI/Camera1/blank.jpg')
 
-        self.jsoninit()
+        self.database = sqlite3.connect("fall_database.db")
 
     def Left(self):
         if self.awal - 16 > 0:
@@ -218,6 +219,14 @@ class SearchPerson(QtWidgets.QMainWindow):
             
         return data
   
+    def name2TDC(self,filename):
+        time = filename[:8]
+        finalTime = time[:4] + "-" + time[4:6] + "-" + time[-2:]
+        date = filename[9:17]
+        channel = f"Camera {filename[25]}"
+        
+        return finalTime, date, channel
+  
     def outputXlsx(self):
         '''
         Output all Data to Excel 
@@ -263,12 +272,9 @@ class SearchPerson(QtWidgets.QMainWindow):
 
         lie_down,chk,sit,squat = 0,0,0,0
         for filename in self.Searchresult:
-            data = self.openJson(self.findChannel(filename))
             position = rows[0]*20+7
-            Event = data[filename[:-4]]['event']
-            Time = data[filename[:-4]]['time']
-            Date = data[filename[:-4]]['date']
-            Channel = f"Camera {data[filename[:-4]]['channel']}"
+            Event = "FallDown"
+            Time,Date,Channel = self.name2TDC(filename)
             image_path = os.path.join('./falldown/cut',filename)
             worksheet.write('A{}'.format(position), str(rows[0]+1))
             worksheet.insert_image('B{}'.format(position), image_path, {'x_scale': 0.6, 'y_scale': 0.6})
@@ -295,7 +301,7 @@ class SearchPerson(QtWidgets.QMainWindow):
         worksheet.write('I3', str(chk))
         workbook.close()
 
-        excelPath = "/home/nvidia/Desktop/fall_v.5_pp_API/output.xlsx"
+        excelPath = "/home/nvidia/Desktop/FDD_Yolov7/output.xlsx"
         folder = QtWidgets.QFileDialog.getExistingDirectory(self, 'Select Folder')
 
         shutil.copyfile(excelPath, os.path.join(folder,excelPath))
@@ -355,7 +361,7 @@ class SearchPerson(QtWidgets.QMainWindow):
     def setIcon(self):
         for index,i in enumerate(self.box):
             try:
-                filename = self.Searchresult[-(self.awal+index)]
+                filename = self.Searchresult[(self.awal+index)]
                 i.label.setIcon(QtGui.QIcon(os.path.join(self.path,filename)))
                 i.label.setIconSize(QtCore.QSize(400,200))
                 i.label.clicked.connect(lambda _, text= filename : self.showDetail(text))
@@ -389,47 +395,50 @@ class SearchPerson(QtWidgets.QMainWindow):
             self.ui.labelPage.setText(f" 1 / {math.ceil(len(self.Searchresult)/16)}")
         QtWidgets.QApplication.restoreOverrideCursor()
 
-    def mainSearch(self):
+    def datetoString(self,date):
+        tahun = date[:4]
+        bulan = date[7:9]
+        tanggal = date[12:14]
+        ending = tahun + "-" + bulan + "-" + tanggal
+        return ending
+
+    def timetoString(self,time):
+        jam =  time[:2]
+        menit = time[3:5]
+        ending = jam+":"+menit+":00"
         
-        import os
+        return ending
+
+    def mainSearch(self):
         '''
             main function
             compare the file time with start/end time
             and use counter to find each filename in allFilename
             if pass the filter -> set icon, text and search next person
         '''
-        
-        startTime       = datetime.strptime(self.ui.startdate.text()  +  ' '  + self.ui.starttime.text() , "%Y / %m / %d %H:%M") 
-        endTime         = datetime.strptime(self.ui.enddate.text()    +  ' '  + self.ui.endtime.text(),"%Y / %m / %d %H:%M")   
     
-        if endTime < startTime:
-            self.time()
-                        
+        startTime = self.datetoString(self.ui.startdate.text()) + " " + self.timetoString(self.ui.starttime.text())
+        endTime = self.datetoString(self.ui.enddate.text()) + " " + self.timetoString(self.ui.endtime.text())
+        
         if self.ui.channel.currentText() == 'All':
-            data = {}
-            data.update(self.all_1)
-            data.update(self.all_2)
-            data.update(self.all_3)
-            data.update(self.all_4)
-            
+            query = f"""
+                SELECT FileName FROM fall
+                WHERE DateTime BETWEEN '{startTime}' and '{endTime}'
+                ORDER BY DateTime DESC
+            """
         else:
-            if self.ui.channel.currentText()[-1] == str(1):
-                data = self.all_1
-            elif self.ui.channel.currentText()[-1] == str(2):
-                data = self.all_2
-            elif self.ui.channel.currentText()[-1] == str(3):
-                data = self.all_3
-            elif self.ui.channel.currentText()[-1] == str(4):
-                data = self.all_4
+            query = f"""
+                SELECT FileName FROM fall
+                WHERE DateTime BETWEEN '{startTime}' and '{endTime}'
+                AND Channel = {self.ui.channel.currentText()}
+                ORDER BY DateTime DESC
+            """
+            
+        data  = self.database.execute(query)
         
         for key in data:
-            searchTime = datetime.strptime(data[key]['date'] + ' '+ data[key]['time'][:-3], "%Y-%m-%d %H:%M")
-            if (startTime<searchTime) and (searchTime<endTime):
-                if self.ui.type.currentText() == str(data[key]['event']):
-                    self.Searchresult.append(key+".jpg")
-                elif self.ui.type.currentText() == 'All':
-                    self.Searchresult.append(key+".jpg")
-        self.Searchresult.sort()
+            self.Searchresult.append(key)
+        
         self.ui.total.setText(str(len(self.Searchresult)))
         
 

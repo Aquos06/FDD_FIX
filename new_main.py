@@ -331,34 +331,20 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         return data
     
     def zoom_show(self,channel):        
-        f = open('json/zoom.json', 'r')
-        zoom_json = json.load(f)
-        f.close()
-        
         if channel == 1:
-            zoom_json['Channel1'] = True
+            self.worker1.Zoom1 = True
         elif channel == 2:
-            zoom_json['Channel2'] = True
+            self.worker1.Zoom2 = True
         elif channel == 3:
-            zoom_json['Channel3'] = True
+            self.worker1.Zoom3 = True
         elif channel == 4:
-            zoom_json['Channel4'] = True
-
-        f = open('json/zoom.json', 'w')
-        json.dump(zoom_json, f, indent= 2)
-        f.close()
+            self.worker1.Zoom4 = True
                 
     def back(self):
-        f = open('json/zoom.json', 'r')
-        zoom_json = json.load(f)
-        f.close()
-        
-        for index,i in enumerate(zoom_json):
-            zoom_json[i] = False
-
-        f = open('json/zoom.json', 'w')
-        json.dump(zoom_json, f, indent=2)
-        f.close()
+        self.worker1.Zoom1 = False
+        self.worker1.Zoom2 = False
+        self.worker1.Zoom3 = False
+        self.worker1.Zoom4 = False
         
     def back2(self):
         self.InfoDetails.close()
@@ -649,6 +635,12 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         self.worker1.channel2 = self.lchannel2
         self.worker1.channel3 = self.lchannel3
         self.worker1.channel4 = self.lchannel4
+        
+        self.worker1.Zoom1 = False
+        self.worker1.Zoom2 = False
+        self.worker1.Zoom3 = False
+        self.worker1.Zoom4 = False
+        
         self.worker1.yolov7 = self.yolov7
         self.worker1.berenti = False
         self.worker1.timenow.connect(self.writetime)

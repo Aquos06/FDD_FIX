@@ -59,6 +59,7 @@ def openJson(filename):
         data = json.load(f)
         f.close()
     except JSONDecodeError:
+        f.close()
         return 
     return data
 

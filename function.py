@@ -8,6 +8,7 @@ from allutility.factoryreset import FactoryReset
 
 import json
 class SettingFunction(QtWidgets.QMainWindow):
+    FuncChange = False
     def __init__(self,mainwindow):
         super().__init__() # in python3, super(Class, self).xxx = super().xxx
         self.ui = Ui_MainWindow()
@@ -117,6 +118,8 @@ class SettingFunction(QtWidgets.QMainWindow):
             data['function']['Camera4'] = False
 
         setStatus["setStatus"] = True
+        
+        SettingFunction.FuncChange = True
 
         fp = open('json/function.json', 'w')
         statusfp = open('json/set.json', 'w')
