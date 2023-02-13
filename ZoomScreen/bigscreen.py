@@ -176,8 +176,6 @@ class AnotherWindow(object):
         self.horizontalLayoutmain.setStretch(2,10)
 
         self.verticalLayout_2.addLayout(self.horizontalLayoutmain)
-        # self.verticalLayout_2.setStretch(0, 1)
-        # self.verticalLayout_2.setStretch(1, 80)
         
         self.horizontalLayout_4.addLayout(self.verticalLayout_2)
         

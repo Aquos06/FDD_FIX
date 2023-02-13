@@ -388,7 +388,7 @@ class Screen9(QMainWindow):
         BiggerScreen.ui.login.clicked.connect(self.goBack)
         
         Maincctv.worker1.screen = BiggerScreen.ui.screen
-        Maincctv.layoutbig = BiggerScreen.ui.layout
+        Maincctv.scrollArea = BiggerScreen.ui.scrollArea
         
     def goBack(self):
         Maincctv.back()
