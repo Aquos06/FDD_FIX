@@ -1,0 +1,57 @@
+{
+  "function": {
+    "light_delay": 3,
+    "counter_reset": "00:00",
+    "roi1": true,
+    "roi2": true,
+    "sound": false,
+    "GPIO": {
+      "gate1": {
+        "light": true,
+        "gate": true
+      },
+      "gate2": {
+        "light": true,
+        "gate": true
+      }
+    }
+  },
+  "worktime": {
+    "\u9031\u4e00": {
+      "starttime1": "09:00",
+      "endtime1": "12:00",
+      "starttime2": "17:00",
+      "endtime2": "20:00"
+    },
+    "\u9031\u4e8c": {
+      "starttime1": "09:00",
+      "endtime1": "12:00",
+      "starttime2": "17:00",
+      "endtime2": "20:00"
+    },
+    "\u9031\u4e09": {
+      "starttime1": "09:00",
+      "endtime1": "12:00",
+      "starttime2": "17:00",
+      "endtime2": "20:00"
+    },
+    "\u9031\u56db": {
+      "starttime1": "09:00",
+      "endtime1": "12:00",
+      "starttime2": "17:00",
+      "endtime2": "20:00"
+    },
+    "\u9031\u4e94": {
+      "starttime1": "09:00",
+      "endtime1": "12:00",
+      "starttime2": "17:00",
+      "endtime2": "20:00"
+    },
+    "\u9031\u516d": {
+      "starttime1": "09:00",
+      "endtime1": "12:00",
+      "starttime2": "17:00",
+      "endtime2": "20:00"
+    }
+  }
+}

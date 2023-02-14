@@ -44,7 +44,7 @@ class SystemSet(QtWidgets.QMainWindow):
 
     def setupData(self):
         try:
-            f = open('config2Channels.json', 'r')
+            f = open('json/config2Channels.json', 'r')
             self.data = json.load(f)
             f.close()
         except:
@@ -54,7 +54,7 @@ class SystemSet(QtWidgets.QMainWindow):
             
             self.data = data
             
-            f = open('config2Channels.json', 'w')
+            f = open('json/config2Channels.json', 'w')
             json.dump(self.data,f,indent=2)
             f.close()
 
@@ -137,7 +137,7 @@ class SystemSet(QtWidgets.QMainWindow):
             self.ui.toggle_IO_4.setChecked(False)
         
     def checkradio(self):
-        f = open('config2Channels.json', 'r')
+        f = open('json/config2Channels.json', 'r')
         data = json.load(f)
         f.close()
         if data['channel1']["ROI"]:
@@ -188,22 +188,22 @@ class SystemSet(QtWidgets.QMainWindow):
             self.data['channel4']['change'] = True
             
     def accept(self):
-        fp  = open('config2Channels_default.json','r')
+        fp  = open('json/config2Channels_default.json','r')
         data = json.load(fp)
         fp.close()    
-        fp = open('config2Channels.json', 'w')
+        fp = open('json/config2Channels.json', 'w')
         json.dump(data, fp, indent=2)
         fp.close()
-        fp  = open('function_default.json','r')
+        fp  = open('json/function_default.json','r')
         data = json.load(fp)
         fp.close()    
-        fp = open('function.json', 'w')
+        fp = open('json/function.json', 'w')
         json.dump(data, fp, indent=2)
         fp.close()
 
     def backup(self):
 
-        f = open('config2Channels.json', 'r')
+        f = open('json/config2Channels.json', 'r')
         content = json.load(f)
         f.close()
 
@@ -323,7 +323,7 @@ class SystemSet(QtWidgets.QMainWindow):
         self.ChannelOn()
         self.checkRoi()
         
-        f = open('config2Channels.json', 'w')
+        f = open('json/config2Channels.json', 'w')
         json.dump(self.data,f,indent=2)
         f.close()
 

@@ -11,8 +11,6 @@ from datetime import datetime
 
 #import trackking
 from track import Trackker 
-#import video stream
-from VideoStreamOriginal import WebcamVideoStream
 #import calculate fall
 from allutility.falutil import Fallutil
 #import coordinate util
@@ -29,11 +27,11 @@ from pyqt_main import roiwidge
 
 class Worker1(QObject):
     
-    zoom_on = QtCore.pyqtSignal(bool, int)
     fall = QtCore.pyqtSignal(str, int)
     timenow = QtCore.pyqtSignal(str)
-    koordinat = QtCore.pyqtSignal(np.ndarray,int)   
     config = QtCore.pyqtSignal(str,int) 
+    AlertRed = QtCore.pyqtSignal(str)
+    AlertYellow = QtCore.pyqtSignal(str)
 
     def openconfig(self):
         camera1_change = False
@@ -109,12 +107,12 @@ class Worker1(QObject):
         self.config_file['channel4']['change'] = False
 
 
-        f = open('config2Channels.json', 'w')
+        f = open('json/config2Channels.json', 'w')
         json.dump(self.config_file, f, indent=2)
         f.close()
              
     def openCam(self):
-        f = open('config2Channels.json','r')
+        f = open('json/config2Channels.json','r')
         config = json.load(f)
         f.close()
 
@@ -135,7 +133,7 @@ class Worker1(QObject):
         self.password4 = config['channel4']['password']        
         
     def prep(self):
-        self.config_file = openJson('config2Channels.json')
+        self.config_file = openJson('json/config2Channels.json')
         self.OCtrack = Trackker()
         self.OCtrack.preparation()
         
@@ -154,10 +152,9 @@ class Worker1(QObject):
         self.openCam()
     
     def Jsonprep(self):
-        self.function = openJson('function.json')
-        self.ROI = openJson('AiSettings.json')
-        self.config_file = openJson('config2Channels.json')
-        # self.zoom = openJson('zoom.json')
+        self.function = openJson('json/function.json')
+        self.ROI = openJson('json/AiSettings.json')
+        self.config_file = openJson('json/config2Channels.json')
 
     def checkROI(self):
         try:
@@ -171,7 +168,7 @@ class Worker1(QObject):
     def checkMin(self):
         try: 
             if self.config_file['channel1']['ROI'] == True:
-                f = open('AiSettings.json', 'r')
+                f = open('json/AiSettings.json', 'r')
                 data = json.load(f)
                 f.close()
 
@@ -250,7 +247,7 @@ class Worker1(QObject):
         for coor in person:
             if coor[0] < 1920:
                 if coor[1] < 1080:
-                    if self.recon1 == False:
+                    if self.recon1 == False and self.Camdetect1:
                         if self.config_file['channel1']['ROI'] == True:
                             if self.calculate.find(self.mask_fall1, coor, person = True) == 1:
                                 person1.append(coor)
@@ -259,7 +256,7 @@ class Worker1(QObject):
                 else:
                     coor[1] -= 1080
                     coor[3] -= 1080
-                    if self.recon3 == False:
+                    if self.recon3 == False and self.Camdetect3:
                         if self.config_file['channel3']['ROI'] == True:
                             if self.calculate.find(self.mask_fall3, coor, person = True) == 1:
                                 person3.append(coor)
@@ -269,7 +266,7 @@ class Worker1(QObject):
                 if coor[1] < 1080:
                     coor[0] -= 1920
                     coor[2] -= 1920
-                    if self.recon2 == False:
+                    if self.recon2 == False and self.Camdetect2:
                         if self.config_file['channel2']['ROI'] == True:
                             if self.calculate.find(self.mask_fall2, coor, person = True) == 1:
                                 person2.append(coor)
@@ -280,7 +277,7 @@ class Worker1(QObject):
                     coor[1] -= 1080
                     coor[2] -= 1920
                     coor[3] -= 1080
-                    if self.recon4 == False:
+                    if self.recon4 == False and self.Camdetect4:
                         if self.config_file['channel4']['ROI'] == True:
                             if self.calculate.find(self.mask_fall4, coor, person = True) == 1:
                                 person4.append(coor)
@@ -338,22 +335,22 @@ class Worker1(QObject):
     def run(self):
         self.prep()
         self.img = np.zeros((2160,3840,3))
-        self.noCam = cv2.imread('NoCamera.png')
+        self.noCam = cv2.imread('images/NoCamera.png')
         while True:
             if self.berenti:
                 continue
 
             else: 
                 if SystemSet.CamChange:
-                    self.config_file = openJson('config2Channels.json')
+                    self.config_file = openJson('json/config2Channels.json')
                     self.openconfig()
                     print('read Camera Config')
                     SystemSet.CamChange = False
                 if SettingFunction.FuncChange:
-                    self.function = openJson('function.json')         
+                    self.function = openJson('json/function.json')         
                     SettingFunction.FuncChange = False
                 if roiwidge.ROIChange:
-                    self.ROI = openJson('AiSettings.json')
+                    self.ROI = openJson('json/AiSettings.json')
                     self.checkROI()
                     roiwidge.ROIChange = False       
 
@@ -380,26 +377,43 @@ class Worker1(QObject):
 
                 coordinate = self.yolov7.predict(self.img)
                 person, fall = self.specific(coordinate)
-                fall,_ = self.OCtrack.tracking(fall,self.img)
+                fall,deleted = self.OCtrack.tracking(fall,self.img)
+                self.findfall.deleteID(deleted)
                 coordinate1, coordinate2, coordinate3, coordinate4 ,fall1, fall2, fall3, fall4 = self.separate(person, fall)
 
                 if len(fall) > 0:
-                    filename1 = self.findfall.final_fall(fall1, self.camera1Img, 1, int(self.function['function']['light_delay']))
-                    filename2 = self.findfall.final_fall(fall2, self.camera2Img, 2, int(self.function['function']['light_delay']))
-                    filename3 = self.findfall.final_fall(fall3, self.camera3Img, 3, int(self.function['function']['light_delay']))
-                    filename4 = self.findfall.final_fall(fall4, self.camera4Img, 4, int(self.function['function']['light_delay']))
+                    filename1, AlertRed1, AlertYellow1 = self.findfall.final_fall(fall1, self.camera1Img, 1, int(self.function['function']['light_delay']))
+                    filename2, AlertRed2, AlertYellow2 = self.findfall.final_fall(fall2, self.camera2Img, 2, int(self.function['function']['light_delay']))
+                    filename3, AlertRed3, AlertYellow3 = self.findfall.final_fall(fall3, self.camera3Img, 3, int(self.function['function']['light_delay']))
+                    filename4, AlertRed4, AlertYellow4 = self.findfall.final_fall(fall4, self.camera4Img, 4, int(self.function['function']['light_delay']))
 
                     for file in filename1:
                         self.fall.emit(file,1)
-
                     for file in filename2:
                         self.fall.emit(file,2)
-                    
                     for file in filename3:
                         self.fall.emit(file,3)
-
                     for file in filename4:
                         self.fall.emit(file,4)
+
+                    for file in AlertRed1:
+                        self.AlertRed.emit(file)
+                    for file in AlertRed2:
+                        self.AlertRed.emit(file)
+                    for file in AlertRed3:
+                        self.AlertRed.emit(file)
+                    for file in AlertRed4:
+                        self.AlertRed.emit(file)
+
+                    for file in AlertYellow1:
+                        self.AlertYellow.emit(file)
+                    for file in AlertYellow2:
+                        self.AlertYellow.emit(file)
+                    for file in AlertYellow3:
+                        self.AlertYellow.emit(file)
+                    for file in AlertYellow4:
+                        self.AlertYellow.emit(file)
+
 
                 try:
                     if self.config_file['channel1']['active'] == True:

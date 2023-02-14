@@ -57,7 +57,7 @@ class SettingFunction(QtWidgets.QMainWindow):
         self.timeTable.ui.show()
 
     def backup_function(self):
-        f = open('function.json', 'r')
+        f = open('json/function.json', 'r')
         content = json.load(f)
         f.close()
         
@@ -87,12 +87,9 @@ class SettingFunction(QtWidgets.QMainWindow):
 
     def buttonClicked(self):
 
-        fp  = open('function.json','r')
-        statusfp  = open('set.json','r')
+        fp  = open('json/function.json','r')
         data = json.load(fp)
-        setStatus = json.load(statusfp)
         fp.close()
-        statusfp.close()
 
         data["function"]["light_delay"] = int(self.ui.delay.text())
         data["function"]["counter_reset"] = self.ui.counterrestart.text()+":00"
@@ -117,16 +114,11 @@ class SettingFunction(QtWidgets.QMainWindow):
         else:
             data['function']['Camera4'] = False
 
-        setStatus["setStatus"] = True
-
         SettingFunction.FuncChange = True
 
-        fp = open('function.json', 'w')
-        statusfp = open('set.json', 'w')
+        fp = open('json/function.json', 'w')
         json.dump(data, fp, indent=2)
-        json.dump(setStatus, statusfp, indent=2)
         fp.close()
-        statusfp.close()
         toLog("GPIO settings is updated")
         self.sub_window.label.setText("確定成功")
         self.Dialogsure.show()

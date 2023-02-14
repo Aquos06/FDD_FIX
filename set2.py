@@ -56,10 +56,10 @@ class SystemSet2(QtWidgets.QMainWindow):
         NewFile = os.path.join(DestFile, "Config")
         os.mkdir(NewFile)
 
-        shutil.copyfile('/home/nvidia/Desktop/fall_v.5_pp_API/config2Channels.json', os.path.join(NewFile,'Config.json'))
-        shutil.copyfile('/home/nvidia/Desktop/fall_v.5_pp_API/AiSettings.json', os.path.join(NewFile, 'AiSettings.json'))
-        shutil.copyfile('/home/nvidia/Desktop/fall_v.5_pp_API/function.json', os.path.join(NewFile, 'function.json'))
-        shutil.copyfile('/home/nvidia/Desktop/fall_v.5_pp_API/json/timeTable.json', os.path.join(NewFile, 'TimeTable.json'))
+        shutil.copyfile('/home/nvidia/Desktop/yolov7/json/config2Channels.json', os.path.join(NewFile,'Config.json'))
+        shutil.copyfile('/home/nvidia/Desktop/yolov7/json/AiSettings.json', os.path.join(NewFile, 'AiSettings.json'))
+        shutil.copyfile('/home/nvidia/Desktop/yolov7/json/function.json', os.path.join(NewFile, 'function.json'))
+        shutil.copyfile('/home/nvidia/Desktop/yolov7/json/json/timeTable.json', os.path.join(NewFile, 'TimeTable.json'))
 
         QtWidgets.QApplication.restoreOverrideCursor()
 
@@ -75,7 +75,7 @@ class SystemSet2(QtWidgets.QMainWindow):
 
     def setupData(self):
 
-        f = open('config2Channels.json', 'r')
+        f = open('json/config2Channels.json', 'r')
         data = json.load(f)
         f.close()
 
@@ -93,7 +93,7 @@ class SystemSet2(QtWidgets.QMainWindow):
         f.close()
         self.ui.IpInput.setText(data['ipaddress'])
 
-        f = open('config2Channels.json','r')
+        f = open('json/config2Channels.json','r')
         data = json.load(f)
         f.close()
 
@@ -158,32 +158,72 @@ class SystemSet2(QtWidgets.QMainWindow):
             self.ui.TimeButton.setEnabled(True)
 
     def checksync(self):
-        f = open('config2Channels.json','r')
+        f = open('json/config2Channels.json','r')
         data = json.load(f)
         f.close()
         if self.ui.asyncSwitch.isChecked():
             data["async"]["enable"] = True
         else:
             data["async"]["enable"] = False
-        f = open('config2Channels.json','w')
+        f = open('json/config2Channels.json','w')
         json.dump(data,f,indent=2)
         f.close()
 
     def storeTime(self):
-        f = open('config2Channels.json', 'r')
+        f = open('json/config2Channels.json', 'r')
         data = json.load(f)
         f.close()
 
         data["async"]['time'] = self.ui.spin_time.value()
 
-        f = open('config2Channels.json', 'w')
+        f = open('json/config2Channels.json', 'w')
         json.dump(data,f,indent=2)
         f.close()
+
+    def checkDT(self,time,date):
+        if len(time) != 8:
+            return False
+        if int(time[:2]) < 0 or int(time[:2]) > 24:
+            return False
+        if time[2] != ":" or time[5] != ":":
+            return False
+        if int(time[3:5]) < 0 or int(time[3:5]) > 59:
+            return False
+        if int(time[6:]) < 0  or int(time[6:]) > 59:
+            return False
+
+        if len(date) != 10:
+            return False
+        if int(date[:4]) < 2010:
+            return False
+        if date[4] != "-" or date[7] != "-":
+            return False
+        if int(date[5:7]) < 0 or int(date[5:7]) > 12:
+            return False
+        if int(date[-2:]) < 0 or int(date[-2:]) > 31:
+            return False
+        
+        return True
+
+    def DTError(self):
+        msg = QtWidgets.QMessageBox()
+        msg.setIcon(QtWidgets.QMessageBox.Warning)
+
+        msg.setText('Please enter the correct date/time')
+        msg.setWindowTitle("Warning")
+
+        msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
+
+        retval = msg.exec_()
 
     def cmdTime(self):
         time = self.ui.zijiInput.text()
         date = self.ui.zidateInput.text()
         dateTime = date + " " + time
+
+        if not self.checkDT(time,date):
+            self.DTError()
+            return
 
         cmd = f'timedatectl  set-time "{dateTime}"'
         os.system(cmd)
@@ -220,7 +260,7 @@ class SystemSet2(QtWidgets.QMainWindow):
         nxconfig = json.load(f)
         f.close()
 
-        f = open('config2Channels.json','r')
+        f = open('json/config2Channels.json','r')
         CamConfig = json.load(f)
         f.close()
 
@@ -412,7 +452,7 @@ class SystemSet2(QtWidgets.QMainWindow):
     def copy(self):
         self.sub_window.label.setText("")
         self.sub_window.label_3.setText("")
-        path ="/home/nvidia/Desktop/fall_v.5_pp_API/falldown" #fill the path 
+        path ="/home/nvidia/Desktop/yolov7/falldown" #fill the path 
 
 
         QtWidgets.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
@@ -424,7 +464,7 @@ class SystemSet2(QtWidgets.QMainWindow):
     def buttonClicked(self):
         
         path  = self.ui.path.text()
-        fp  = open('config2Channels.json','r')
+        fp  = open('json/config2Channels.json','r')
         data = json.load(fp)
         fp.close()
 
@@ -432,18 +472,18 @@ class SystemSet2(QtWidgets.QMainWindow):
         if(self.ui.cover.currentText() == '停止'): data["utils"]["storageMethod"] = True
         else: data["utils"]["storageMethod"] = False
         
-        fp = open('config2Channels.json', 'w')
+        fp = open('json/config2Channels.json', 'w')
         json.dump(data, fp, indent=2)
         fp.close()
 
     def browsefile(self):
         fname = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
         self.ui.path.setText(fname)
-        f = open('config2Channels.json','r')
+        f = open('json/config2Channels.json','r')
         data = json.load(f)
         f.close()
         data['backup']['user_path'] = fname
-        f = open('config2Channels.json', 'w')
+        f = open('json/config2Channels.json', 'w')
         json.dump(data,f,indent=2)
         f.close()
 

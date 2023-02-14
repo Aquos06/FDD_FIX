@@ -63,7 +63,7 @@ class Screen2(QMainWindow): #CCTV
         
         global Maincctv
         Maincctv= TwoScreen(self)
-        f = open("personal.json", "r")
+        f = open("json/personal.json", "r")
         self.data = json.load(f)
         f.close()
         global Settings_4
@@ -78,7 +78,7 @@ class Screen2(QMainWindow): #CCTV
         Maincctv.lastSync = Settings_2.ui.syncTime
             
         def foo1(*args, **kwargs):
-            f = open('config2Channels.json','r')
+            f = open('json/config2Channels.json','r')
             data = json.load(f)
             f.close()            
             if data['channel1']['active'] == True:
@@ -88,7 +88,7 @@ class Screen2(QMainWindow): #CCTV
                 widget.setCurrentWidget(screen9)
 
         def foo2(*args, **kwargs):
-            f = open('config2Channels.json','r')
+            f = open('json/config2Channels.json','r')
             data = json.load(f)
             f.close()  
             if data['channel2']['active'] == True:
@@ -98,7 +98,7 @@ class Screen2(QMainWindow): #CCTV
                 widget.setCurrentWidget(screen9)
 
         def foo3(*args, **kwargs):
-            f = open('config2Channels.json','r')
+            f = open('json/config2Channels.json','r')
             data = json.load(f)
             f.close()  
             if data['channel3']['active'] == True:
@@ -108,7 +108,7 @@ class Screen2(QMainWindow): #CCTV
                 widget.setCurrentWidget(screen9)
 
         def foo4(*args, **kwargs):
-            f = open('config2Channels.json','r')
+            f = open('json/config2Channels.json','r')
             data = json.load(f)
             f.close()  
             if data['channel4']['active'] == True:
@@ -272,13 +272,13 @@ class Screen6(QMainWindow): #password
     def gotonext(self):
         if self.uipass.lineEdit_3.text() == 'admin' and self.uipass.lineEdit_4.text() == 'admin':
 
-            f = open('personal.json', 'r')
+            f = open('json/personal.json', 'r')
             self.data = json.load(f)
             f.close()
             
             self.data['loggedIn'] = True
             
-            f = open('personal.json', 'w')
+            f = open('json/personal.json', 'w')
             json.dump(self.data,f,indent=2)
             f.close()
             
@@ -388,7 +388,19 @@ class Screen9(QMainWindow):
         BiggerScreen.ui.login.clicked.connect(self.goBack)
         
         Maincctv.worker1.screen = BiggerScreen.ui.screen
-        Maincctv.scrollArea = BiggerScreen.ui.scrollArea
+        Maincctv.BigBox1 = BiggerScreen.ui.box1
+        Maincctv.BigBox2 = BiggerScreen.ui.box2
+        Maincctv.BigBox3 = BiggerScreen.ui.box3
+        Maincctv.BigBox4 = BiggerScreen.ui.box4
+        Maincctv.BigBox5 = BiggerScreen.ui.box5
+        Maincctv.BigBox6 = BiggerScreen.ui.box6
+        Maincctv.BigBox7 = BiggerScreen.ui.box7
+        Maincctv.BigBox8 = BiggerScreen.ui.box8
+        Maincctv.BigBox9 = BiggerScreen.ui.box9
+        Maincctv.BigBox10 = BiggerScreen.ui.box10
+
+        Maincctv.BigBox = [Maincctv.BigBox1, Maincctv.BigBox2, Maincctv.BigBox3, Maincctv.BigBox4, Maincctv.BigBox5, 
+        Maincctv.BigBox6, Maincctv.BigBox7, Maincctv.BigBox8, Maincctv.BigBox9, Maincctv.BigBox10]
         
     def goBack(self):
         Maincctv.back()
@@ -433,7 +445,7 @@ class Screen10(QMainWindow):
         if event.buttons() == QtCore.Qt.RightButton:
             self.gotoprotol()
 
-app=QApplication(sys.argv)
+app=QApplication([''])
 widget=QtWidgets.QStackedWidget()
 
 screen1 = Screen1() #protol
