@@ -47,11 +47,7 @@
   "async": {
     "time": 10,
     "date": "2023-02-02",
-<<<<<<< HEAD
-    "last": "17:56:40",
-=======
     "last": "15:39:22",
->>>>>>> c94bce0b34136af23e7ed6fc4178b7a5b2603ae3
     "enable": true
   },
   "deviceID": 137

@@ -219,9 +219,7 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         
         postData = self.toData(filename,self.cut_add, self.ss_add, "Fall Down")
         if post('http://192.168.0.107/api/v2/captures/fallDown', json.dumps(postData), None, SERVER_GIVE_TOKEN) != 200:
-            f = open('json/InternetProb.json','r')
-            inet = json.load(f)
-            f.close()
+            inet = openJson('json/InternetProb.json')
 
             failData = {
                 filename:postData
@@ -240,9 +238,7 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         
         capture_at = round(time.time() * 1000.0)
 
-        f = open('json/config2Channels.json','r')
-        data = json.load(f)
-        f.close()
+        data = openJson('json/config2Channels.json')
      
         deviceID = data['deviceID']
        
@@ -325,7 +321,7 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         if data[todayDay]['Camera1']['all'] == True:
             self.worker1.Camdetect1 = True
         else:
-            if data[todayDay]['Camera1']['hour'][hourNow] == 1:
+            if hourNow in data[todayDay]['Camera1']['hour']:
                 self.worker1.Camdetect1 = True
             else:
                 self.worker1.Camdetect1 = False
@@ -333,7 +329,7 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         if data[todayDay]['Camera2']['all'] == True:
             self.worker1.Camdetect2 = True
         else:
-            if data[todayDay]['Camera2']['hour'][hourNow] == 1:
+            if hourNow in data[todayDay]['Camera2']['hour']:
                 self.worker1.Camdetect2 = True
             else:
                 self.worker1.Camdetect2 = False
@@ -341,7 +337,7 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         if data[todayDay]['Camera3']['all'] == True:
             self.worker1.Camdetect3 = True
         else:
-            if data[todayDay]['Camera3']['hour'][hourNow] == 1:
+            if hourNow in data[todayDay]['Camera3']['hour']:
                 self.worker1.Camdetect3 = True
             else:
                 self.worker1.Camdetect3 = False
@@ -349,7 +345,7 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         if data[todayDay]['Camera4']['all'] == True:
             self.worker1.Camdetect4 = True
         else:
-            if data[todayDay]['Camera4']['hour'][hourNow] == 1:
+            if hourNow in data[todayDay]['Camera4']['hour']:
                 self.worker1.Camdetect4 = True
             else:
                 self.worker1.Camdetect4 = False

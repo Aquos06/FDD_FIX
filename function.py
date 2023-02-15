@@ -9,10 +9,10 @@ from allutility.factoryreset import FactoryReset
 import json
 class SettingFunction(QtWidgets.QMainWindow):
     FuncChange = False
-    def __init__(self,mainwindow):
+    def __init__(self):
         super().__init__() # in python3, super(Class, self).xxx = super().xxx
         self.ui = Ui_MainWindow()
-        self.ui.setupUi(mainwindow)
+        self.ui.setupUi(self)
         self.Dialogsure = QtWidgets.QDialog()
         self.sub_window = Ui_Dialog() 
         self.sub_window.setupUi(self.Dialogsure)

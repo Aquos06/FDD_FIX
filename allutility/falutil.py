@@ -9,6 +9,19 @@ import sqlite3
 class Fallutil():
 
     def __init__(self):
+        '''
+        today = String -> Date for today
+        store = Dictionary -> {
+            counter: How many times fall detected
+            event: what type of event
+            pass: is it Truely falldown
+            saved: has is it been saved
+            date: date 
+            time: time
+            channel : Camera Id
+            alert: yellow/red/none
+        }
+        '''
         self.today = date.today()
         self.today = str(self.today)
         self.today= self.editdate()
@@ -142,16 +155,15 @@ class Fallutil():
             if (time_now_seconds - key_time_seconds) >= delay and (time_now_seconds - key_time_seconds) <= (delay+1):
                 if int(self.store[self.kunci][key]['counter']) >= (delay*int(2*float(self.fallRatio['ratio']))):
                     self.store[self.kunci][key]['pass'] = True
+                    
             elif (time_now_seconds - key_time_seconds) > (delay+1) and self.store[self.kunci][key]['pass'] != True:
                 self.deleteKey.append(key)
 
-            elif (time_now_seconds - key_time_seconds) > 30:
-                if self.store[self.kunci][key]["alert"] != "Red":
+            elif (time_now_seconds - key_time_seconds) > 30 and self.store[self.kunci]["alert"] == "Yellow":
                     self.store[self.kunci][key]["alert"] = "Red"
                     self.AlertRed.append(key)
 
-            elif (time_now_seconds - key_time_seconds) > 10:
-                if self.store[self.kunci][key]["alert"] != "Yellow":
+            elif (time_now_seconds - key_time_seconds) > 10 and self.store[self.kunci]["alert"] == "":
                     self.store[self.kunci][key]["alert"] = "Yellow"
                     self.AlertYellow.append(key)    
 

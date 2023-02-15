@@ -8,6 +8,12 @@ SERVER_GIVE_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsiZmFjZWFpIl
 
 class TimeSelect(QtWidgets.QWidget):
     def __init__(self):
+        '''
+        self.button1: list of button in the Camera1
+        self.button2: list of button in the Camera2
+        self.button3: list of button in the Camera3
+        self.button4: list of butotn in the Camera4
+        '''
         super().__init__()
         self.ui = TimeTable()
         self.ui.setupUi()
@@ -42,16 +48,16 @@ class TimeSelect(QtWidgets.QWidget):
         self.flag_3 = False
         self.flag_4 = False
 
-        for index,i in enumerate(self.button3):
+        for i in self.button3:
             i.clicked.connect(self.disable3)
         
-        for index,i in enumerate(self.button1):
+        for i in self.button1:
             i.clicked.connect(self.disable1)
 
-        for index,i in enumerate(self.button2):
+        for i in self.button2:
             i.clicked.connect(self.disable2)
 
-        for index,i in enumerate(self.button4):
+        for i in self.button4:
             i.clicked.connect(self.disable4)
 
         self.ui.buttonOK.clicked.connect(self.save)
@@ -60,6 +66,11 @@ class TimeSelect(QtWidgets.QWidget):
         self.ui.camera2_all.clicked.connect(self.allcheck2)
         self.ui.camera3_all.clicked.connect(self.allcheck3)
         self.ui.camera4_all.clicked.connect(self.allcheck4)
+        
+        self.Camera1 = []
+        self.Camera2 = []
+        self.Camera3 = []
+        self.Camera4 = []
 
 
     def disable1(self):
@@ -75,6 +86,18 @@ class TimeSelect(QtWidgets.QWidget):
         self.ui.camera4_all.setChecked(False)
         
     def setupUI(self,day):
+        '''
+        First set all of the button unChecked
+        '''
+        for i in self.button1: i.setChecked(False)
+        for i in self.button2: i.setChecked(False)
+        for i in self.button3: i.setChecked(False)
+        for i in self.button4: i.setChecked(False)
+            
+        self.disable1()
+        self.disable2()
+        self.disable3()
+        self.disable4()
         
         self.day = day
         f = open('json/timeTable.json' , 'r')
@@ -88,11 +111,8 @@ class TimeSelect(QtWidgets.QWidget):
                 i.setChecked(True)
                 
         else:
-            for index, i in enumerate(data[self.day]['Camera1']['hour']):
-                if i == 1:
-                    self.button1[index].setChecked(True)
-                else:
-                    self.button1[index].setChecked(False)
+            for i in data[self.day]['Camera1']['hour']:
+                self.button1[index].setChecked(True)
                     
                     
         if data[self.day]['Camera2']['all'] == True:
@@ -102,11 +122,8 @@ class TimeSelect(QtWidgets.QWidget):
                 i.setChecked(True)
         
         else:
-            for index, i in enumerate(data[self.day]['Camera2']['hour']):
-                if i == 1:
-                    self.button2[index].setChecked(True)
-                else:
-                    self.button2[index].setChecked(False)
+            for index in data[self.day]['Camera2']['hour']:
+                self.button2[index].setChecked(True)
         
         if data[self.day]['Camera3']['all'] == True:
             self.flag_3 = True
@@ -115,11 +132,8 @@ class TimeSelect(QtWidgets.QWidget):
                 i.setChecked(True)
        
         else:
-            for index, i in enumerate(data[self.day]['Camera3']['hour']):
-                if i == 1:
-                    self.button3[index].setChecked(True)
-                else:
-                    self.button3[index].isChecked(False)
+            for index in data[self.day]['Camera3']['hour']:
+                self.button3[index].setChecked(True)
 
         if data[self.day]['Camera4']['all'] == True:
             self.flag_4 = True
@@ -128,11 +142,8 @@ class TimeSelect(QtWidgets.QWidget):
                 i.setChecked(True)
 
         else:
-            for index, i in enumerate(data[self.day]['Camera4']['hour']):
-                if i == 1:
-                    self.button4[index].setChecked(True)
-                else:
-                    self.button4[index].setChecked(False)
+            for index in data[self.day]['Camera4']['hour']:
+                self.button4[index].setChecked(True)
                     
     def allcheck1(self):
         if not self.flag_1:
@@ -183,7 +194,7 @@ class TimeSelect(QtWidgets.QWidget):
         nxconfig = json.load(f)
         f.close()
 
-        f = open('config2Channels.json','r')
+        f = open('json/config2Channels.json','r')
         CamConfig = json.load(f)
         f.close()
 
@@ -244,97 +255,86 @@ class TimeSelect(QtWidgets.QWidget):
         f = open('json/timeTable.json', 'r')
         data = json.load(f)
         f.close()
+        
+        self.Camera1.clear()
+        self.Camera2.clear()
+        self.Camera3.clear()
+        self.Camera4.clear()
 
         if self.ui.forALL.isChecked():
-            for i in data:
+            for i in enumerate(data):
                 if self.ui.camera1_all.isChecked():
                     data[i]['Camera1']['all'] = True
                 else:
                     data[i]['Camera1']['all'] = False
-                    
                     for index,button in enumerate(self.button1):
                         if button.isChecked():
-                            data[i]['Camera1']['hour'][index] = 1
-                        else:
-                            data[i]['Camera1']['hour'][index] = 0
+                            self.Camera1.append(index)
+                    data[i]['Camera1']['hour'] = self.Camera1
                             
                 if self.ui.camera2_all.isChecked():
                     data[i]['Camera2']['all'] = True
                 else:
                     data[i]['Camera2']['all'] = False
-                    
                     for index,button in enumerate(self.button2):
                         if button.isChecked():
-                            data[i]['Camera2']['hour'][index] = 1
-                        else:
-                            data[i]['Camera2']['hour'][index] = 0
+                            self.Camera2.append(index)
+                    data[i]['Camera2']['hour'] = self.Camera2
                     
                 if self.ui.camera3_all.isChecked():
                     data[i]['Camera3']['all'] = True
                 else:
                     data[i]['Camera3']['all'] = False
-                    
                     for index,button in enumerate(self.button3):
                         if button.isChecked():
-                            data[i]['Camera3']['hour'][index] = 1
-                        else:
-                            data[i]['Camera3']['hour'][index] = 0
+                            self.Camera3.append(index)
+                    data[i]['Camera3']['hour'] = self.Camera3
                     
                 if self.ui.camera4_all.isChecked():
                     data[i]['Camera4']['all'] = True
                 else:
                     data[i]['Camera4']['all'] = False
-                    
                     for index,button in enumerate(self.button4):
                         if button.isChecked():
-                            data[i]['Camera4']['hour'][index] = 1
-                        else:
-                            data[i]['Camera4']['hour'][index] = 0
+                            self.Camera4.append(index)
+                    data[i]['Camera4']['hour'] = self.Camera4
         else: 
             if self.ui.camera1_all.isChecked():
                 data[self.day]['Camera1']['all'] = True
             else:
                 data[self.day]['Camera1']['all'] = False
-                
                 for index,i in enumerate(self.button1):
                     if i.isChecked():
-                        data[self.day]['Camera1']['hour'][index] = 1
-                    else:
-                        data[self.day]['Camera1']['hour'][index] = 0
+                        self.Camera1.append(index)
+                data[self.day]['Camera1']['hour'] = self.Camera1
                         
             if self.ui.camera2_all.isChecked():
                 data[self.day]['Camera2']['all'] = True
             else:
                 data[self.day]['Camera2']['all'] = False
-                
                 for index,i in enumerate(self.button2):
                     if i.isChecked():
-                        data[self.day]['Camera2']['hour'][index] = 1
-                    else:
-                        data[self.day]['Camera2']['hour'][index] = 0
-                
+                        self.Camera2.append(index)
+                data[self.day]['Camera2']['hour'] = self.Camera2
+                        
             if self.ui.camera3_all.isChecked():
                 data[self.day]['Camera3']['all'] = True
             else:
                 data[self.day]['Camera3']['all'] = False
-                
                 for index,i in enumerate(self.button3):
                     if i.isChecked():
-                        data[self.day]['Camera3']['hour'][index] = 1
-                    else:
-                        data[self.day]['Camera3']['hour'][index] = 0
+                        self.Camera3.append(index)
+                data[self.day]['Camera3']['hour'] = self.Camera3
                 
             if self.ui.camera4_all.isChecked():
                 data[self.day]['Camera4']['all'] = True
             else:
                 data[self.day]['Camera4']['all'] = False
-                
                 for index,i in enumerate(self.button4):
                     if i.isChecked():
-                        data[self.day]['Camera4']['hour'][index] = 1
-                    else:
-                        data[self.day]['Camera4']['hour'][index] = 0
-        
+                        self.Camera4.append(index)
+                data[self.day]['Camera4']['hour'] = self.Camera4
+
         f = open('json/timeTable.json', 'w')
         json.dump(data,f,indent=2)
         f.close()
