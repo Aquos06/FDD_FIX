@@ -2,30 +2,7 @@
   "Camera1": {
     "person": {},
     "PPE": {},
-    "fall down": {
-      "MultiRect_1": {
-        "coor": [
-          [
-            789,
-            367
-          ],
-          [
-            940,
-            351
-          ],
-          [
-            1285,
-            1047
-          ],
-          [
-            737,
-            1029
-          ]
-        ],
-        "enable": true,
-        "color": 0
-      }
-    },
+    "fall down": {},
     "maximum": {},
     "minimum": {}
   },
