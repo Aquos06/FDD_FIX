@@ -159,11 +159,11 @@ class Fallutil():
             elif (time_now_seconds - key_time_seconds) > (delay+1) and self.store[self.kunci][key]['pass'] != True:
                 self.deleteKey.append(key)
 
-            elif (time_now_seconds - key_time_seconds) > 30 and self.store[self.kunci]["alert"] == "Yellow":
+            elif (time_now_seconds - key_time_seconds) > 30 and self.store[self.kunci][key]["alert"] == "Yellow":
                     self.store[self.kunci][key]["alert"] = "Red"
                     self.AlertRed.append(key)
 
-            elif (time_now_seconds - key_time_seconds) > 10 and self.store[self.kunci]["alert"] == "":
+            elif (time_now_seconds - key_time_seconds) > 10 and self.store[self.kunci][key]["alert"] == "":
                     self.store[self.kunci][key]["alert"] = "Yellow"
                     self.AlertYellow.append(key)    
 
