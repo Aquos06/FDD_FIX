@@ -1,3 +1,7 @@
 {
+<<<<<<< HEAD
   "loggedIn": true
+=======
+  "loggedIn": false
+>>>>>>> c94bce0b34136af23e7ed6fc4178b7a5b2603ae3
 }

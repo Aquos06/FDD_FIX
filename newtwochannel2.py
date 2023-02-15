@@ -215,46 +215,50 @@ class Ui_MainWindowp(object):
         self.layout.setSpacing(0)
         
         #insert 10 box
+        self.vertical = QtWidgets.QVBoxLayout()
+        self.vertical.setSpacing(0)
         self.box1 = Box()
         self.box1.setMinimumSize(QtCore.QSize(150,200))
-        self.layout.insertWidget(self.box1)
-        
+        self.vertical.addWidget(self.box1)
+
         self.box2 = Box()
         self.box2.setMinimumSize(QtCore.QSize(150,200))
-        self.layout.insertWidget(self.box2)
+        self.vertical.addWidget(self.box2)
         
         self.box3 = Box()
         self.box3.setMinimumSize(QtCore.QSize(150,200))
-        self.layout.insertWidget(self.box3)
-        
+        self.vertical.addWidget(self.box3)
+
         self.box4 = Box()
         self.box4.setMinimumSize(QtCore.QSize(150,200))
-        self.layout.insertWidget(self.box4)
-    
+        self.vertical.addWidget(self.box4)
+
         self.box5 = Box()
         self.box5.setMinimumSize(QtCore.QSize(150,200))
-        self.layout.insertWidget(self.box5)
-        
+        self.vertical.addWidget(self.box5)
+
         self.box6 = Box()
         self.box6.setMinimumSize(QtCore.QSize(150,200))
-        self.layout.insertWidget(self.box6)
-        
+        self.vertical.addWidget(self.box6)
+
         self.box7 = Box()
         self.box7.setMinimumSize(QtCore.QSize(150,200))
-        self.layout.insertWidget(self.box7)
-        
+        self.vertical.addWidget(self.box7)
+
         self.box8 = Box()
         self.box8.setMinimumSize(QtCore.QSize(150,200))
-        self.layout.insertWidget(self.box8)
-        
+        self.vertical.addWidget(self.box8)
+
         self.box9 = Box()
         self.box9.setMinimumSize(QtCore.QSize(150,200))
-        self.layout.insertWidget(self.box9)
-        
+        self.vertical.addWidget(self.box9)
+
         self.box10 = Box()
         self.box10.setMinimumSize(QtCore.QSize(150,200))
-        self.layout.insertWidget(self.box10)
-        
+        self.vertical.addWidget(self.box10)
+
+        self.layout.addLayout(self.vertical)
+
         self.scrollAreaWidgetContents.setLayout(self.layout)
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
 
@@ -301,12 +305,6 @@ class Ui_MainWindowp(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
 
         self.login.setText(_translate("MainWindow", "Login"))
-        
-        # self.lchannel3.setPixmap(self.img2pyqt_2("recon.png",self.lchannel3))       
-        # self.lchannel3.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter)
-        # self.lchannel4.setPixmap(self.img2pyqt_2("recon.png",self.lchannel4))       
-        # self.lchannel4.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter)
-        
         self.labelTotal.setText(_translate("MainWindow", "<font color = red>跌倒</font>："))
         self.labelNum.setText(_translate("MainWindow", "<font color=red>0</font> "))
         self.time.setText(_translate("MainWindow", "00:00:00"))

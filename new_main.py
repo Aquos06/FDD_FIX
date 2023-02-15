@@ -62,9 +62,10 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
 
         self.layoutbig = 0
         self.screen = 0
+        self.nowJam = 0
 
-        self.img = cv2.imread('NoCamera.png')
-        self.ReconImg = cv2.imread('recon.png')
+        self.img = cv2.imread('images/NoCamera.png')
+        self.ReconImg = cv2.imread('images/recon.png')
         setupLogin()
         
         self.box = [self.box1, self.box2, self.box3, self.box4, self.box5,
@@ -72,12 +73,14 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
 
         self.tenFall = []
 
+        self.cut_add = './falldown/cut'
+        self.ss_add = './falldown/screenshot'
+
         self.setSynctoTime()
-        
         self.startThread()
 
     def setSynctoTime(self):
-        data = openJson('json/config2Channels.json', 'r')
+        data = openJson('json/config2Channels.json')
         data['async']['last'] = time.strftime("%H:%M:%S")
 
         f = open('json/config2Channels.json', 'w')
@@ -145,25 +148,11 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
     def details(self,filename):
         channel = filename[25]
         
-        if channel == str(1):
-            f = open('./falldown/all_falldown.json', 'r')
-        elif channel == str(2):
-            f = open('./falldown/all_falldown2.json', 'r')
-        elif channel == str(3):
-            f = open('./falldown/all_falldown3.json', 'r')
-        elif channel == str(4):
-            f = open('./falldown/all_falldown4.json', 'r')
-        
-        data = json.load(f)
-        f.close()
-        
-        
         image_ss = filename
         image = filename
-        date = data[filename]['date']
-        time = data[filename]['time']
-        channel = data[filename]['channel']
-        type  = data[filename]['event']
+        date = filename[:8]
+        time = filename[9:17]
+        type  = "Falldown"
         
         self.InfoDetails.showFullScreen()
         self.InfoDetails.input(image_ss,image,date,time,channel,type)
@@ -202,21 +191,25 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         
         self.tenFall.append(filename)
         if len(self.tenFall) > 10:
-            self.tenFall.pop()
-        
-        cut_add = './falldown/cut'
-        ss_add = './falldown/screenshot'
+            self.tenFall.pop(0)
         
         f = open('json/function.json', 'r')
         GPIOData = json.load(f)
         f.close()
 
-        for index, filename in enumerate(self.tenFall):
+        for index, filename in enumerate(reversed(self.tenFall)):
             self.box[index].setMinimumSize(QtCore.QSize(150,200))
-            self.box[index].label.setIcon(QtGui.QIcon(os.path.join(cut_add, (f"{filename}.jpg"))))
+            self.box[index].label.setIcon(QtGui.QIcon(os.path.join(self.cut_add, (f"{filename}.jpg"))))
             self.box[index].label.setIconSize(QtCore.QSize(150,150))
             self.box[index].information.setText(text("Falldown", filename[9:17], filename[25]))
             self.box[index].label.clicked.connect(lambda _, text = filename : self.details(text))
+
+        for index, filename in enumerate(reversed(self.tenFall)):
+            self.BigBox[index].setMinimumSize(QtCore.QSize(150,200))
+            self.BigBox[index].label.setIcon(QtGui.QIcon(os.path.join(self.cut_add, (f"{filename}.jpg"))))
+            self.BigBox[index].label.setIconSize(QtCore.QSize(150,150))
+            self.BigBox[index].information.setText(text("Falldown", filename[9:17], filename[25]))
+            self.BigBox[index].label.clicked.connect(lambda _, text = filename : self.details(text))
         
         # if GPIOData['function'][self.camera] == True:
         #     self.Soundon()
@@ -224,7 +217,7 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         self.totalFall += 1
         self.labelNum.setText(f'<font color=red>{self.totalFall}</font> ')
         
-        postData = self.toData(filename,cut_add, ss_add, data[filename]['event'])
+        postData = self.toData(filename,self.cut_add, self.ss_add, "Fall Down")
         if post('http://192.168.0.107/api/v2/captures/fallDown', json.dumps(postData), None, SERVER_GIVE_TOKEN) != 200:
             f = open('json/InternetProb.json','r')
             inet = json.load(f)
@@ -242,7 +235,7 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
 
             toLog('Failed to upload Event to Server')
 
-    def toData(self, filename, pathToCut, pathToSS,typeEvent,cid = 0):
+    def toData(self, filename, pathToCut, pathToSS,typeEvent,cid = 0, alert= ""):
         cid = int(filename.split("_")[2][-1])-1
         
         capture_at = round(time.time() * 1000.0)
@@ -264,6 +257,7 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         
         data = {
             'deviceId': deviceID,
+            'metadata':[alert],
             'cid'     : cid,
             'captured_at': capture_at,
             'type': "falldown",
@@ -321,7 +315,7 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
          
     def checkDetect(self, time):
 
-        data = openJson('json/timeTable.json','r')
+        data = openJson('json/timeTable.json')
 
         hourNow = datetime.now().strftime('%H')
         hourNow = datetime.strptime(hourNow,'%H')
@@ -329,12 +323,36 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
 
         todayDay = datetime.today().strftime('%A')
         if data[todayDay]['Camera1']['all'] == True:
-            self.worker1.detect = True
+            self.worker1.Camdetect1 = True
         else:
             if data[todayDay]['Camera1']['hour'][hourNow] == 1:
-                self.worker1.detect = True
+                self.worker1.Camdetect1 = True
             else:
-                self.worker1.detect = False
+                self.worker1.Camdetect1 = False
+
+        if data[todayDay]['Camera2']['all'] == True:
+            self.worker1.Camdetect2 = True
+        else:
+            if data[todayDay]['Camera2']['hour'][hourNow] == 1:
+                self.worker1.Camdetect2 = True
+            else:
+                self.worker1.Camdetect2 = False
+
+        if data[todayDay]['Camera3']['all'] == True:
+            self.worker1.Camdetect3 = True
+        else:
+            if data[todayDay]['Camera3']['hour'][hourNow] == 1:
+                self.worker1.Camdetect3 = True
+            else:
+                self.worker1.Camdetect3 = False
+
+        if data[todayDay]['Camera4']['all'] == True:
+            self.worker1.Camdetect4 = True
+        else:
+            if data[todayDay]['Camera4']['hour'][hourNow] == 1:
+                self.worker1.Camdetect4 = True
+            else:
+                self.worker1.Camdetect4 = False
 
     def getAPI(self,timeNow,tanggal):
         toLog("Sync Settings with Server")
@@ -346,7 +364,7 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
             toLog('Fail to Sync with server')
             return
         
-        data = openJson('json/config2Channels.json','r')
+        data = openJson('json/config2Channels.json')
 
         data['deviceID'] = dataAPI['result'][0]['id']
 
@@ -541,9 +559,19 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
             self.videoStream.src = uri
             self.videoStream.change = True
         elif channel == 3:
-            self.videoStream3.streamFunc(uri)
+            self.videoStream3.src = uri
+            self.videoStream3.change = True
         else:
-            self.videoStream4.streamFunc(uri)
+            self.videoStream4.src = uri
+            self.videoStream4.src = True
+
+    def redAlert(self, filename):
+        data = self.toData(filename,self.cut_add, self.ss_add, "Fall Down", alert = "Red")
+        post('http://192.168.0.107/api/v2/captures/fallDown', json.dumps(data), None, SERVER_GIVE_TOKEN)
+
+    def yellowAlert(self, filename):
+        data = self.toData(filename,self.cut_add, self.ss_add, "Fall Down", alert = "Yellow")
+        post('http://192.168.0.107/api/v2/captures/fallDown', json.dumps(data), None, SERVER_GIVE_TOKEN)
 
     def makeThread1(self):
         
@@ -561,12 +589,19 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
         self.worker1.Zoom2 = False
         self.worker1.Zoom3 = False
         self.worker1.Zoom4 = False
+
+        self.worker1.Camdetect1 = True
+        self.worker1.Camdetect2 = True
+        self.worker1.Camdetect3 = True
+        self.worker1.Camdetect4 = True
         
         self.worker1.yolov7 = self.yolov7
         self.worker1.berenti = False
         self.worker1.timenow.connect(self.writetime)
         self.worker1.config.connect(self.changeIP)
         self.worker1.fall.connect(self.showFall)
+        self.worker1.AlertRed.connect(self.redAlert)
+        self.worker1.AlertYellow.connect(self.yellowAlert)
         
         self.thread1.start()
 
@@ -576,13 +611,15 @@ class TwoScreen(QMainWindow, Ui_MainWindowp):
 
         if time_now[-8:-3] == data['function']['counter_reset']:
             self.reset()
+
+        if self.nowJam != time_now[-8:-6]:
+            self.checkDetect(time_now)
         
         # self.asyncAPI(time_now)
         # self.rePost(self)
-        # self.checkDetect(time_now)
         
     def rePost(self):
-        inet = openJson('json/InternetProb.json','r')
+        inet = openJson('json/InternetProb.json')
 
         if len(inet) == 0:
             return

@@ -25,7 +25,11 @@ class AiSettings(QtWidgets.QMainWindow):
         self.setupData()
 
     def setupData(self):
+<<<<<<< HEAD
         f = open('./json/AiSettings.json', 'r')
+=======
+        f = open('json/AiSettings.json', 'r')
+>>>>>>> c94bce0b34136af23e7ed6fc4178b7a5b2603ae3
         data = json.load(f)
         f.close()
 
@@ -139,14 +143,22 @@ class AiSettings(QtWidgets.QMainWindow):
     def saveFile(self):
         self.channel = self.toCamera(self.ui.tabs.currentIndex())
         
+<<<<<<< HEAD
         f = open('./json/AiSettings.json', 'r')
+=======
+        f = open('json/AiSettings.json', 'r')
+>>>>>>> c94bce0b34136af23e7ed6fc4178b7a5b2603ae3
         self.data = json.load(f)
         f.close()
         
         self.checkOnOFF()
         
         try:
+<<<<<<< HEAD
             f = open('./json/AiSettings.json', 'w')
+=======
+            f = open('json/AiSettings.json', 'w')
+>>>>>>> c94bce0b34136af23e7ed6fc4178b7a5b2603ae3
             json.dump(self.data,f, indent=2)
             f.close()
             toLog('save AI Settings')

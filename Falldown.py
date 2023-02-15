@@ -388,7 +388,19 @@ class Screen9(QMainWindow):
         BiggerScreen.ui.login.clicked.connect(self.goBack)
         
         Maincctv.worker1.screen = BiggerScreen.ui.screen
-        Maincctv.scrollArea = BiggerScreen.ui.scrollArea
+        Maincctv.BigBox1 = BiggerScreen.ui.box1
+        Maincctv.BigBox2 = BiggerScreen.ui.box2
+        Maincctv.BigBox3 = BiggerScreen.ui.box3
+        Maincctv.BigBox4 = BiggerScreen.ui.box4
+        Maincctv.BigBox5 = BiggerScreen.ui.box5
+        Maincctv.BigBox6 = BiggerScreen.ui.box6
+        Maincctv.BigBox7 = BiggerScreen.ui.box7
+        Maincctv.BigBox8 = BiggerScreen.ui.box8
+        Maincctv.BigBox9 = BiggerScreen.ui.box9
+        Maincctv.BigBox10 = BiggerScreen.ui.box10
+
+        Maincctv.BigBox = [Maincctv.BigBox1, Maincctv.BigBox2, Maincctv.BigBox3, Maincctv.BigBox4, Maincctv.BigBox5, 
+        Maincctv.BigBox6, Maincctv.BigBox7, Maincctv.BigBox8, Maincctv.BigBox9, Maincctv.BigBox10]
         
     def goBack(self):
         Maincctv.back()
@@ -433,7 +445,7 @@ class Screen10(QMainWindow):
         if event.buttons() == QtCore.Qt.RightButton:
             self.gotoprotol()
 
-app=QApplication(sys.argv)
+app=QApplication([''])
 widget=QtWidgets.QStackedWidget()
 
 screen1 = Screen1() #protol

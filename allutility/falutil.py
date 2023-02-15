@@ -19,10 +19,38 @@ class Fallutil():
             "Camera4": {}
         }
         
-        self.con = sqlite3.connect("fall_database.db")
-        self.database = self.con.cursor()
+        self.deleteKey = []
+        self.AlertRed = []
+        self.AlertYellow = []
+        self.deleteSoon = []
+        self.camera = ["Camera1", "Camera2", "Camera3", "Camera4"]
+
+        self.database = sqlite3.connect("fall_database.db")
+
+    def deleteID(self, id):
+        '''
+        id: list of deleted ID
+        '''
+
+        self.deleteSoon.clear()
+        for i in self.camera:
+            for key in self.store[i]:
+                if int(key[27:]) in id:
+                    self.deleteSoon.append([i,key])
+
+        for i in self.deleteSoon:
+            del self.store[i[0]][i[1]]
+
+        return
         
     def final_fall(self,fall_coor,image,channel,delay):
+        '''
+        fall_coor: list of fall down coordinate
+        image: image for saving
+        channel: intergert (Which camera 0,1,2,3) 
+        delay: interger
+        '''
+
         self.channel = channel
         ratio = open('./json/ratio.json','r')
         self.fallRatio = json.load(ratio)
@@ -40,7 +68,7 @@ class Fallutil():
         self.checkInBox(fall_coor,image,channel)
         fallname = self.check_VFall(delay)
         
-        return fallname
+        return fallname, self.AlertRed, self.AlertYellow
         
     def editdate(self):
         strtoday =""
@@ -73,7 +101,6 @@ class Fallutil():
             
             if self.checkKey(int(personId),channel):
                 time_now = time.strftime("%H%M%S")
-                self.store[self.kunci][self.key]['time'] = time_now[:2] + ":" + time_now[2:4] + ":" + time_now[-2:]
                 self.store[self.kunci][self.key]['counter'] += 1
             else:
                 new_data = {
@@ -85,6 +112,7 @@ class Fallutil():
                         "date" : self.today[:4] + "-" + self.today[4:6] + "-" + self.today[-2:],
                         "time" : time_now[:2] + ":" + time_now[3:5] + ":" + time_now[-2:],
                         "channel": channel,
+                        "alert": ""
                     }
                 }
                 filename = f"{self.today}_{time_now}_channel{channel}_{int(personId)}" + ".jpg"
@@ -106,12 +134,29 @@ class Fallutil():
     def check_VFall(self,delay):
         time_now = datetime.now()
         time_now_seconds = self.timetoint(time_now.hour, time_now.minute, time_now.second)
-        self.deleteKey = []
+        self.deleteKey.clear()
+        self.AlertRed.clear()
+        self.AlertYellow.clear()
         for key in self.store[self.kunci]:
             key_time_seconds = self.timetoint(int(self.store[self.kunci][key]['time'][:2]), int(self.store[self.kunci][key]['time'][3:5]), int(self.store[self.kunci][key]['time'][-2:]))    
-            if (time_now_seconds - key_time_seconds) < delay:
+            if (time_now_seconds - key_time_seconds) >= delay and (time_now_seconds - key_time_seconds) <= (delay+1):
                 if int(self.store[self.kunci][key]['counter']) >= (delay*int(2*float(self.fallRatio['ratio']))):
                     self.store[self.kunci][key]['pass'] = True
+            elif (time_now_seconds - key_time_seconds) > (delay+1) and self.store[self.kunci][key]['pass'] != True:
+                self.deleteKey.append(key)
+
+            elif (time_now_seconds - key_time_seconds) > 30:
+                if self.store[self.kunci][key]["alert"] != "Red":
+                    self.store[self.kunci][key]["alert"] = "Red"
+                    self.AlertRed.append(key)
+
+            elif (time_now_seconds - key_time_seconds) > 10:
+                if self.store[self.kunci][key]["alert"] != "Yellow":
+                    self.store[self.kunci][key]["alert"] = "Yellow"
+                    self.AlertYellow.append(key)    
+
+        for i in self.deleteKey:
+            del self.store[self.kunci][i]        
                 
         fallname = self.SaveFall()
 
@@ -139,9 +184,12 @@ class Fallutil():
                             if filename[:-4] == ".jpg":
                                 os.remove(filename)
                                 break
-                
-                shutil.move(os.path.join(temp_path,key), os.path.join(fixed_path,key), copy_function= shutil.copy2)
-                shutil.move(os.path.join(temp_path_ss,key), os.path.join(fixed_path_ss,key), copy_function= shutil.copy2)
+                try:
+                    shutil.move(os.path.join(temp_path,key), os.path.join(fixed_path,key), copy_function= shutil.copy2)
+                    shutil.move(os.path.join(temp_path_ss,key), os.path.join(fixed_path_ss,key), copy_function= shutil.copy2)
+                except:
+                    print("Failed to find picture")
+                    continue
                 
                 key = key[:-4]
                 
@@ -160,8 +208,5 @@ class Fallutil():
                 self.database.commit()
             
                 key_temp.append(key)
-
-        for key in key_temp:
-            del self.store[self.kunci][key]
 
         return key_temp

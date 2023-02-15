@@ -9,7 +9,7 @@ class Ui_MainWindow(object):
         MainWindow.setStyleSheet("background:black;")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setAutoFillBackground(False)
-        self.centralwidget.setStyleSheet("background-image : url(background.png);")
+        self.centralwidget.setStyleSheet("background-image : url(images/background.png);")
         self.centralwidget.setObjectName("centralwidget")
         self.horizontalLayout_4 = QtWidgets.QHBoxLayout(self.centralwidget)
         self.horizontalLayout_4.setContentsMargins(0, 0, 0, 0)
@@ -26,7 +26,7 @@ class Ui_MainWindow(object):
         self.label_10.setMaximumSize(QtCore.QSize(540, 95))
         self.label_10.setStyleSheet("background:blue")
         self.label_10.setText("")
-        self.label_10.setPixmap(QtGui.QPixmap("logoo.png"))
+        self.label_10.setPixmap(QtGui.QPixmap("images/logoo.png"))
         self.label_10.setScaledContents(False)
         self.label_10.setObjectName("label_10")
         self.horizontalLayout_5.addWidget(self.label_10) #horizontal 0
@@ -579,13 +579,13 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.pushButton_6.setIcon(QtGui.QIcon("home_white.png"))
+        self.pushButton_6.setIcon(QtGui.QIcon("images/home_white.png"))
         self.pushButton_6.setIconSize(QtCore.QSize(60, 60))
-        self.pushButton_8.setIcon(QtGui.QIcon("video.png"))
+        self.pushButton_8.setIcon(QtGui.QIcon("images/video.png"))
         self.pushButton_8.setIconSize(QtCore.QSize(70, 70))
-        self.pushButton_7.setIcon(QtGui.QIcon("settings_white.png"))
+        self.pushButton_7.setIcon(QtGui.QIcon("images/settings_white.png"))
         self.pushButton_7.setIconSize(QtCore.QSize(60, 60))
-        self.pushButton_search.setIcon(QtGui.QIcon("search_pls.png"))
+        self.pushButton_search.setIcon(QtGui.QIcon("images/search_pls.png"))
         self.pushButton_search.setIconSize(QtCore.QSize(85,85))
         self.label_23.setText(_translate("MainWindow", "查詢"))
         self.label.setText(_translate("MainWindow", "開始時間"))
@@ -610,9 +610,6 @@ class Ui_MainWindow(object):
         
         self.label_6.setText(_translate("MainWindow", "總人數 ： "))
         self.total.setText(_translate("MainWindow", "0"))
-        # self.pushButton_35.setText(_translate("MainWindow", "<<"))
-        # self.label_4.setText(_translate("MainWindow", "0/0"))
-        # self.pushButton_43.setText(_translate("MainWindow", ">>"))
 
 if __name__ == "__main__":
     import sys

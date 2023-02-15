@@ -56,10 +56,10 @@ class SystemSet2(QtWidgets.QMainWindow):
         NewFile = os.path.join(DestFile, "Config")
         os.mkdir(NewFile)
 
-        shutil.copyfile('/home/nvidia/Desktop/fall_v.5_pp_API/config2Channels.json', os.path.join(NewFile,'Config.json'))
-        shutil.copyfile('/home/nvidia/Desktop/fall_v.5_pp_API/AiSettings.json', os.path.join(NewFile, 'AiSettings.json'))
-        shutil.copyfile('/home/nvidia/Desktop/fall_v.5_pp_API/function.json', os.path.join(NewFile, 'function.json'))
-        shutil.copyfile('/home/nvidia/Desktop/fall_v.5_pp_API/json/timeTable.json', os.path.join(NewFile, 'TimeTable.json'))
+        shutil.copyfile('/home/nvidia/Desktop/yolov7/json/config2Channels.json', os.path.join(NewFile,'Config.json'))
+        shutil.copyfile('/home/nvidia/Desktop/yolov7/json/AiSettings.json', os.path.join(NewFile, 'AiSettings.json'))
+        shutil.copyfile('/home/nvidia/Desktop/yolov7/json/function.json', os.path.join(NewFile, 'function.json'))
+        shutil.copyfile('/home/nvidia/Desktop/yolov7/json/json/timeTable.json', os.path.join(NewFile, 'TimeTable.json'))
 
         QtWidgets.QApplication.restoreOverrideCursor()
 
@@ -75,7 +75,7 @@ class SystemSet2(QtWidgets.QMainWindow):
 
     def setupData(self):
 
-        f = open('./json/config2Channels.json', 'r')
+        f = open('json/config2Channels.json', 'r')
         data = json.load(f)
         f.close()
 
@@ -165,7 +165,7 @@ class SystemSet2(QtWidgets.QMainWindow):
             data["async"]["enable"] = True
         else:
             data["async"]["enable"] = False
-        f = open('config2Channels.json','w')
+        f = open('json/config2Channels.json','w')
         json.dump(data,f,indent=2)
         f.close()
 
@@ -180,10 +180,50 @@ class SystemSet2(QtWidgets.QMainWindow):
         json.dump(data,f,indent=2)
         f.close()
 
+    def checkDT(self,time,date):
+        if len(time) != 8:
+            return False
+        if int(time[:2]) < 0 or int(time[:2]) > 24:
+            return False
+        if time[2] != ":" or time[5] != ":":
+            return False
+        if int(time[3:5]) < 0 or int(time[3:5]) > 59:
+            return False
+        if int(time[6:]) < 0  or int(time[6:]) > 59:
+            return False
+
+        if len(date) != 10:
+            return False
+        if int(date[:4]) < 2010:
+            return False
+        if date[4] != "-" or date[7] != "-":
+            return False
+        if int(date[5:7]) < 0 or int(date[5:7]) > 12:
+            return False
+        if int(date[-2:]) < 0 or int(date[-2:]) > 31:
+            return False
+        
+        return True
+
+    def DTError(self):
+        msg = QtWidgets.QMessageBox()
+        msg.setIcon(QtWidgets.QMessageBox.Warning)
+
+        msg.setText('Please enter the correct date/time')
+        msg.setWindowTitle("Warning")
+
+        msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
+
+        retval = msg.exec_()
+
     def cmdTime(self):
         time = self.ui.zijiInput.text()
         date = self.ui.zidateInput.text()
         dateTime = date + " " + time
+
+        if not self.checkDT(time,date):
+            self.DTError()
+            return
 
         cmd = f'timedatectl  set-time "{dateTime}"'
         os.system(cmd)
@@ -412,7 +452,7 @@ class SystemSet2(QtWidgets.QMainWindow):
     def copy(self):
         self.sub_window.label.setText("")
         self.sub_window.label_3.setText("")
-        path ="/home/nvidia/Desktop/fall_v.5_pp_API/falldown" #fill the path 
+        path ="/home/nvidia/Desktop/yolov7/falldown" #fill the path 
 
 
         QtWidgets.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)

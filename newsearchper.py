@@ -1,32 +1,28 @@
 
 from newsearchmain import Ui_MainWindow
-from components.searchBox import searchBox
-from glob import glob
 from datetime import datetime
 from PyQt5 import QtGui, QtWidgets, QtCore
 from PyQt5.QtGui import QImage , QPixmap
-from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtCore import QDate
 from components.Details.Falling import Falling
 import cv2
 import json
 import xlsxwriter
 import os
-import numpy as np
 import shutil
 import math
 import sqlite3
+import time
 
 from allutility.utility import text, textforstat, toLog
-from components.searchBox import searchBox
 
 count  = [0,1]
 
 class SearchPerson(QtWidgets.QMainWindow):
-    def __init__(self):
+    def __init__(self,mainwindow):
         super(SearchPerson,self).__init__() # in python3, super(Class, self).xxx = super().xxx
         self.ui = Ui_MainWindow()
-        self.ui.setupUi(self)
+        self.ui.setupUi(mainwindow)
         self.Searchresult = []
         self.det = Falling()
         self.det.ui.setupUi(self)
@@ -112,67 +108,7 @@ class SearchPerson(QtWidgets.QMainWindow):
 
         self.det.ui.InformationLabel.setText(textforstat(event,date,time,channel))
 
-    def jsoninit(self):
-        try:
-            f = open('falldown/all_falldown.json','r')
-            self.all_1 = json.load(f)
-            f.close()
-        except:
-            f = open('falldown/all_falldown.json','w')
-            data={}
-            json.dump(data,f,indent=2)
-            
-            f = open('falldown/all_falldown.json','r')
-            self.all_1 = json.load(f)
-            f.close()
-        else:
-            print('Open Camera1 Json File: Success...')
-        
-        try: 
-            f = open('falldown/all_falldown2.json', 'r')
-            self.all_2 = json.load(f)
-            f.close()
-        except:        
-            f = open('falldown/all_falldown2.json','w')
-            data={}
-            json.dump(data,f,indent=2)
-            
-            f = open('falldown/all_falldown2.json','r')
-            self.all_2 = json.load(f)
-            f.close()
-        else:
-            print('Open Camera2 Json File: Success...')
-        
-        try:
-            f = open('falldown/all_falldown3.json', 'r')
-            self.all_3 = json.load(f)
-            f.close()
-        except:
-            f = open('falldown/all_falldown3.json','w')
-            data={}
-            json.dump(data,f,indent=2)
-            
-            f = open('falldown/all_falldown3.json','r')
-            self.all_3 = json.load(f)
-            f.close()
-        else:
-            print('Open Camera3 Json File: Success...')
-        
-        try:
-            f = open('falldown/all_falldown4.json', 'r')
-            self.all_4 = json.load(f)
-            f.close()
-        except:
-            f = open('falldown/all_falldown4.json','w')
-            data={}
-            json.dump(data,f,indent=2)
-            
-            f = open('falldown/all_falldown4.json','r')
-            self.all_4 = json.load(f)
-            f.close()
-        else:
-            print('Open Camera4 Json File: Success...')
-
+ 
     def setup_control(self):
         '''
         Initial button Count and stack
@@ -198,26 +134,6 @@ class SearchPerson(QtWidgets.QMainWindow):
     def findChannel(self, filename):
         channel = filename.split("_")[2]
         return int(channel[-1])
-  
-    def openJson(self, channel):
-        if channel == 1:
-            f = open('./falldown/all_falldown.json', 'r')
-            data = json.load(f)
-            f.close()
-        elif channel == 2:
-            f = open('./falldown/all_falldown2.json', 'r')
-            data = json.load(f)
-            f.close()
-        elif channel == 3:
-            f = open('./falldown/all_falldown3.json', 'r')
-            data = json.load(f)
-            f.close()
-        elif channel == 4:
-            f = open('./falldown/all_falldown4.json', 'r')
-            data = json.load(f)
-            f.close()
-            
-        return data
   
     def name2TDC(self,filename):
         time = filename[:8]
@@ -381,6 +297,7 @@ class SearchPerson(QtWidgets.QMainWindow):
             i.information.setText("")
 
     def searchReady(self):
+        start = time.time()
         QtWidgets.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
         self.Searchresult.clear()
         self.mainSearch()
@@ -394,6 +311,7 @@ class SearchPerson(QtWidgets.QMainWindow):
             self.setIcon()
             self.ui.labelPage.setText(f" 1 / {math.ceil(len(self.Searchresult)/16)}")
         QtWidgets.QApplication.restoreOverrideCursor()
+        print(f"time: {time.time() - start}")
 
     def datetoString(self,date):
         tahun = date[:4]
@@ -437,8 +355,8 @@ class SearchPerson(QtWidgets.QMainWindow):
         data  = self.database.execute(query)
         
         for key in data:
-            self.Searchresult.append(key)
-        
+            self.Searchresult.append(key[0]+".jpg")
+
         self.ui.total.setText(str(len(self.Searchresult)))
         
 

@@ -30,7 +30,7 @@ def setupLogin():
     f.close()
     
     
-    f = open('./json/config2Channels.json', 'r')
+    f = open('json/config2Channels.json', 'r')
     data = json.load(f)
     f.close()
     
@@ -39,7 +39,7 @@ def setupLogin():
     data['channel3']['change'] = False
     data['channel4']['change'] = False
     
-    f = open('./json/config2Channels.json', 'w')
+    f = open('json/config2Channels.json', 'w')
     json.dump(data,f,indent=2)
     f.close()
 

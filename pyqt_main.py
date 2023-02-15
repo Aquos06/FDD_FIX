@@ -480,13 +480,15 @@ class roiwidge(QWidget):  # 介面布局自動縮放
             
             roiwidge.ROIChange = True
 
-            # f = open('json/AiSettings.json', 'r')
+            roiwidge.ROIChange = True
+
+            # f = open('AiSettings.json', 'r')
             # data = json.load(f)
             # f.close()
 
             # data[self.channel]['change'] = True
 
-            # f = open('json/AiSettings.json', 'w')
+            # f = open('AiSettings.json', 'w')
             # json.dump(data,f,indent=2)
             # f.close()
 

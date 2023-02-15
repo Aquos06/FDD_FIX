@@ -179,9 +179,6 @@ class Details(object):
         self.horizontalLayoutmain.setStretch(2,10)
 
         self.verticalLayout_2.addLayout(self.horizontalLayoutmain)
-        # self.verticalLayout_2.setStretch(0, 1)
-        # self.verticalLayout_2.setStretch(1, 80)
-        
         self.horizontalLayout_4.addLayout(self.verticalLayout_2)
         
         self.horizontalLayout_4.setStretch(0, 80)
@@ -197,18 +194,10 @@ class Details(object):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-        #ulabel1: Picture or image 
-        #utime: Information TIme + class dkk
-        #uicon: di delete
-        
-    
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.label_6.setText(_translate("MainWindow", "Camera 1  "))
-        # self.label_2.setText(_translate("MainWindow", "<font color = red> 跌到</font> / 總人數 : "))
-        # self.label.setText(_translate("MainWindow", "0<font color=white> / 0</font>"))
-
         self.back.setText(_translate("MainWindow", "Back"))
 
 if __name__ == "__main__":

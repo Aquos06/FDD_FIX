@@ -15,7 +15,7 @@ class detect():
     def __init__(self):
         set_logging()
         self.device = select_device('0')
-        self.model = attempt_load('best.pt', map_location= self.device)
+        self.model = attempt_load('weights/best.pt', map_location= self.device)
         self.model(torch.zeros(1, 3, 640, 640).to(self.device).type_as(next(self.model.parameters())))
         # self.model = TracedModel(self.model, self.device, 640)
         self.model.half()

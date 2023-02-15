@@ -10,7 +10,7 @@
   },
   "channel2": {
     "place": "\u5927\u95802",
-    "ip": "192.168.0.53",
+    "ip": "192.168.0.35",
     "user": "admin",
     "password": "ai123456",
     "active": true,
@@ -19,11 +19,11 @@
   },
   "channel3": {
     "place": "\u5927\u95803",
-    "ip": "192.168.0.53",
+    "ip": "192.168.0.142",
     "user": "admin",
     "password": "ai123456",
     "active": true,
-    "ROI": true,
+    "ROI": false,
     "change": false
   },
   "channel4": {
@@ -32,7 +32,7 @@
     "user": "admin",
     "password": "ai123456",
     "active": true,
-    "ROI": true,
+    "ROI": false,
     "change": false
   },
   "utils": {
@@ -47,7 +47,11 @@
   "async": {
     "time": 10,
     "date": "2023-02-02",
+<<<<<<< HEAD
     "last": "17:56:40",
+=======
+    "last": "15:39:22",
+>>>>>>> c94bce0b34136af23e7ed6fc4178b7a5b2603ae3
     "enable": true
   },
   "deviceID": 137
